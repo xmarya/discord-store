@@ -1,3 +1,4 @@
+
 //@ts-nocheck
 /*
     NOTE: This is where you can control the behaviour of the library 
@@ -6,10 +7,10 @@
 
 import { createNewUser } from "@/actions/authActions";
 import { getUser } from "@/controllers/controllerGlobal";
-import { DiscordUser } from "@/types/DiscordUser";
-import { AppError } from "@/utils/AppError";
 import NextAuth, { type DefaultSession } from "next-auth";
 import Discord from "next-auth/providers/discord";
+
+
 // By default, the `id` property does not exist on `session` of async session({ session, user})
 // See the [TypeScript](https://authjs.dev/getting-started/typescript) on how to add it.
 declare module "next-auth" {
@@ -21,6 +22,7 @@ declare module "next-auth" {
         user: {
             id: string // `session.user.id` is now a valid property, and will be type-checked
             // in places like `useSession().data.user` or `auth().user`
+            userType:string,
             /**
              * By default, TypeScript merges new interface properties and overwrites existing ones.
              * In this case, the default session user properties will be overwritten,
@@ -42,14 +44,16 @@ const authConfig = NextAuth({
             // before give the access to the protected routes by returning false or true
         },
 
-        async signIn({user, profile, account}) {
+        async signIn({ user }) {
 
             try {
               
               if(typeof user.email !== "string") return false; // to solve => Argument of type 'string | null | undefined' is not assignable to parameter of type 'string'.
-
+              // 1) look up for the sam email in the db
               const isExist = await getUser(user.email);
-              console.log("isExist", !!isExist);
+              console.log("isExist", !!isExist, isExist);
+
+              // 2) if not exist then create a new user
               if(!isExist) await createNewUser(user);
               return true;
 
@@ -58,16 +62,16 @@ const authConfig = NextAuth({
               // NOTE: this md only returns boolean, that'w why I can't throw any error here,
               // handle any error where this md was called (inside the authActions.ts).
             }
-
-            // 1) look up for the sam email in the db
-            // 2) if not exist then create a new user
-
         },
 
-        async session({ session, user, token}) {
-            console.log("auth session -user:", user);
-            console.log("auth session -session:", session);
-            console.log("auth session -token:", token);
+        async session({ session }) {
+
+          const currentUser = await getUser(session?.user.email);
+          console.log("currentUser🔴", currentUser);
+
+          // 1) adding the role and the id to the session info:
+          // session.user.id = currentUser._id;
+          // session.user.userType = currentUser.userType;
 
             return session;
         },

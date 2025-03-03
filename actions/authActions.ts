@@ -19,3 +19,8 @@ export const createNewUser = withDBConnection( async(newUser) => {
     // NOTE: I think there is no need to return the newly created usr because the signIn callback only returns boolean
     // return user;
 });
+
+export const updateAuthUser = withDBConnection(async(email: string, formDate:FormData) => {
+
+});
+   

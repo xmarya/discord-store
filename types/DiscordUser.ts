@@ -6,5 +6,6 @@ export interface DiscordUser {
     id:string
     name:string,
     email:string,
-    image:string
+    image:string,
+    userType:string
 }

@@ -1,7 +1,6 @@
-import { AppError } from "@/utils/AppError";
+
 import mongoose from "mongoose";
-
-
+import { AppError } from "@/utils/AppError";
 
 // const db = process.env.NODE_ENV === "production" ? process.env.DB_ATLAS : process.env.LOCAL_DB;
 const db:string = process.env.LOCAL_DB as string;
@@ -12,7 +11,6 @@ export async function dbStartConnection() {
     // we have to check the connection be fore establishing one.
     if(isConnected) {
         console.log("already connected");
-        return;
     };
 
     try {
