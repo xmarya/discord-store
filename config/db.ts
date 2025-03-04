@@ -2,11 +2,11 @@
 import mongoose from "mongoose";
 import { AppError } from "@/utils/AppError";
 
-// const db = process.env.NODE_ENV === "production" ? process.env.DB_ATLAS : process.env.LOCAL_DB;
-const db:string = process.env.LOCAL_DB as string;
+
 let isConnected = false;
 
 export async function dbStartConnection() {
+    mongoose.set("strictQuery", true)
     // because the NEXT.js and vercel are serverless 
     // we have to check the connection be fore establishing one.
     if(isConnected) {
@@ -15,6 +15,8 @@ export async function dbStartConnection() {
 
     try {
         // for connecting to MongoDB Atlas, TLS/SSL is enabled by default.
+        // const db = process.env.NODE_ENV === "production" ? process.env.DB_ATLAS : process.env.LOCAL_DB;
+        const db:string = process.env.LOCAL_DB as string;
         await mongoose.connect(db);
         isConnected = true;
         console.log("the db is connected...");

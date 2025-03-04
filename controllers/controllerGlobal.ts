@@ -1,6 +1,5 @@
 "use server"
 
-import { dbStartConnection } from "@/config/db";
 import Auth from "@/models/authModel";
 import { withDBConnection } from "@/utils/controllerWrapper";
 import mongoose from "mongoose";
@@ -23,7 +22,7 @@ export const getUser = withDBConnection( async(email: string) => {
   const user = await Auth.find({discordEmail: email});
   // console.log("getUser", typeof user); // prints object
 
-  return user;
+  return JSON.parse(JSON.stringify(user)); // NOTE: to extract the _id:new ObjectId('67c43f535c8da8d1edff3aa1')
   
 });
 
