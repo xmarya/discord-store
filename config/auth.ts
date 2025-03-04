@@ -1,79 +1,84 @@
 //@ts-nocheck
 /*
-    NOTE: This is where you can control the behaviour of the library 
-    and specify custom authentication logic, adapters, etc.
+NOTE: This is where you can control the behaviour of the library 
+and specify custom authentication logic, adapters, etc.
 */
 
-import { createNewUser } from "@/actions/authActions";
-import { getUser } from "@/controllers/controllerGlobal";
-import { DiscordUser } from "@/types/DiscordUser";
-import { AppError } from "@/utils/AppError";
 import NextAuth, { type DefaultSession } from "next-auth";
 import Discord from "next-auth/providers/discord";
+
+// import authConfig from "./auth.config";
+import { createNewUser } from "@/actions/authActions";
+import { getUser } from "@/controllers/controllerGlobal";
+import Auth from "@/models/authModel";
+
 // By default, the `id` property does not exist on `session` of async session({ session, user})
 // See the [TypeScript](https://authjs.dev/getting-started/typescript) on how to add it.
 declare module "next-auth" {
-    /**
+  /**
    * Returned by `auth`, `useSession`, `getSession` and received as a prop on the `SessionProvider` React Context
    */
 
-    interface Session {
-        user: {
-            id: string // `session.user.id` is now a valid property, and will be type-checked
-            // in places like `useSession().data.user` or `auth().user`
-            /**
-             * By default, TypeScript merges new interface properties and overwrites existing ones.
-             * In this case, the default session user properties will be overwritten,
-             * with the new ones defined above. To keep the default session user properties,
-             * you need to add them back into the newly declared interface.
-             */
-        } & DefaultSession["user"]
-    }
+  interface Session {
+    user: {
+      id: string; // `session.user.id` is now a valid property, and will be type-checked
+      // in places like `useSession().data.user` or `auth().user`
+      userType: string;
+      /**
+       * By default, TypeScript merges new interface properties and overwrites existing ones.
+       * In this case, the default session user properties will be overwritten,
+       * with the new ones defined above. To keep the default session user properties,
+       * you need to add them back into the newly declared interface.
+       */
+    } & DefaultSession["user"];
+  }
 }
 
-
 const authConfig = NextAuth({
-    providers:[Discord],
-    callbacks:{ // NOTE: the callbacks are the app middlewares
+  providers: [Discord],
+  session: {
+    strategy: "jwt",
+  },
+  callbacks: {
+    // NOTE: the callbacks are the app middlewares
 
-        authorized: async ({auth: currentSession, request}) => {
-            return !!currentSession?.user;
-            // authorized() callback check whether the user is authorised or not
-            // before give the access to the protected routes by returning false or true
-        },
-
-        async signIn({user, profile, account}) {
-
-            try {
-              
-              if(typeof user.email !== "string") return false; // to solve => Argument of type 'string | null | undefined' is not assignable to parameter of type 'string'.
-
-              const isExist = await getUser(user.email);
-              console.log("isExist", !!isExist);
-              if(!isExist) await createNewUser(user);
-              return true;
-
-            } catch (error) {
-              return false;
-              // NOTE: this md only returns boolean, that'w why I can't throw any error here,
-              // handle any error where this md was called (inside the authActions.ts).
-            }
-
-            // 1) look up for the sam email in the db
-            // 2) if not exist then create a new user
-
-        },
-
-        async session({ session, user, token}) {
-            console.log("auth session -user:", user);
-            console.log("auth session -session:", session);
-            console.log("auth session -token:", token);
-
-            return session;
-        },
-
+    authorized: async ({ auth: currentSession, request }) => {
+      return !!currentSession?.user;
+      // authorized() callback check whether the user is authorised or not
+      // before give the access to the protected routes by returning false or true
     },
-    /*NOTE:
+
+    async signIn({ user }) {
+      try {
+        if (typeof user.email !== "string") return false; // to solve => Argument of type 'string | null | undefined' is not assignable to parameter of type 'string'.
+        // 1) look up for the sam email in the db
+        const isExist = await getUser(user.email);
+        // console.log("isExist", !!isExist, isExist);
+
+        // 2) if not exist then create a new user
+        if (!isExist) await createNewUser(user);
+        return true;
+      } catch (error) {
+        return false;
+        // NOTE: this md only returns boolean, that'w why I can't throw any error here,
+        // handle any error where this md was called (inside the authActions.ts).
+      }
+    },
+    async session({ session }) {
+      const currentUser = await getUser(session?.user.email);
+      // console.log("currentUser🔴", currentUser, typeof currentUser);
+
+      // 1) adding the role and the id to the session info:
+      session.user.id = currentUser[0]._id;
+      session.user.userType = currentUser[0].userType;
+      console.log(session);
+
+      // console.log("the working session FINALLY", session);
+      return session;
+    },
+  },
+  // ...authConfig,
+  /*NOTE:
         I face a problem where the app took me directly to the auth.js default page to login using discord
         and didn't show the home page either the login page with the button of discord I created
         THE SOLUTION was specifying the pages object to tell what page we want the auth.js to use.
@@ -83,15 +88,14 @@ const authConfig = NextAuth({
         so the auth middleware that is imported inside middleware.ts was working for all the app routers
 
     */
-    pages: {
-        signIn: "/login"
-    }
+  pages: {
+    signIn: "/login",
+  },
 });
 
 // NOTE: the auth we're exported here, its is what we're going to call in different places
 //      throughout the code to get the session's info
-export const {auth, handlers, signIn, signOut} = authConfig;
-
+export const { auth, handlers, signIn, signOut } = authConfig;
 
 /**
  * auth signin -user: {

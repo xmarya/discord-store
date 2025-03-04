@@ -11,6 +11,7 @@ import { auth } from "./config/auth";
 export const middleware = auth;
 
 export const config = {
+  runtime: 'nodejs',
   matcher: [
     "/dashboard",
 

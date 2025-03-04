@@ -1,7 +1,5 @@
-
 import { dbStartConnection } from "@/config/db";
 import { AppError } from "./AppError";
-import { Document } from "mongoose";
 
             /* 3- accepts the passed Generic and use it to type my parameters*/
 type Controller <Args extends any[]> = (...args: Args) => any;
@@ -21,6 +19,12 @@ export const withDBConnection = <Args extends any[]> (Controller:Controller<Args
     return async (...args: Args) => {
     try {
       await dbStartConnection();
+      /* OLD CODE (kept for reference): 
+        Controller(...args);
+        without `return await`, the HOF won't wait for the  inner promise inside the controller until resolved or rejected
+        and the code execution proceeds bypassing the `await` inside the controller itself. Instead, 
+        it resolves immediately, returning undefined before the inner promise resolves.
+       */
       return await Controller(...args);
     } catch (error) {
       console.log("inside withDBConnection catch block");
