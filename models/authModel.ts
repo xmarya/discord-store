@@ -1,4 +1,5 @@
 import { Schema, model, models } from "mongoose";
+import User from "@/models/userModel";
 
 const authSchema = new Schema({
     discordId: {
@@ -80,6 +81,21 @@ const authSchema = new Schema({
         required: true,
         select: false // excluding this filed from the find* queries.
     },
+});
+
+authSchema.post("save", async function(createdDoc) {
+    // console.log("post save🔴", createdDoc);
+    await User.create({
+        userAuth: createdDoc._id,
+        username: createdDoc.discordName
+    });
+    /*NOTE:
+        User.create() internally calls new User() and .save(), 
+        but it does not pass validateBeforeSave: false to .save().
+        By explicitly creating an instance (new User(...)) and then saving it 
+        .save({ validateBeforeSave: false }), we ensure validation is skipped.
+    */
+    
 });
 
 const Auth = models?.Auth || model("Auth", authSchema);

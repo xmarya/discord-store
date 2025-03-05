@@ -1,4 +1,4 @@
-import { Schema, model } from "mongoose";
+import { Schema, model, models } from "mongoose";
 
 const userSchema = new Schema({
     userAuth: {
@@ -12,29 +12,28 @@ const userSchema = new Schema({
         unique: true,
         trim: true
     },
-    userImage: String,
     subscribedPlanDetails: {
         name: {
             type: String,
-            enum: ["basic", "plus","unlimited"],
+            enum: ["basic", "plus","unlimited", "none"],
             required: [true, "the registeredPlan field is required"],
             // NOTE: I highly recommending this to be embeded document 1-1 relationship
+            default: "none", // since the user first will signin using discord, the info of this field won't be available, so we'll set it to 'none' temporarily
         },
         price: {
             type: Number,
             required: [true, "the registeredPlan field is required"],
+            default: 0
         },
         subscribeStarts: {
             // TODO: pre("save") hook to set the start time
             type: Date,
-            required: [true, "the subscribeStarts filed is required"]
         },
         subscribeEnds: {
             // TODO:this field should be calculated the moment the subscribeStarts field is initialised or updated
             // using pre(save/update) hook.
             // PLUS, it doesn't need any recalculation that's why I didn't make it a virtual filed
             type: Date,
-            required: [true, "the subscribeEnds filed is required"]
         },
     },
     pastSubscriptions: [{
@@ -43,7 +42,7 @@ const userSchema = new Schema({
         //  once the subscribeStarts property updated
         plan: {
             type: String,
-            enum: ["basic", "plus"],
+            enum: ["basic", "plus", "unlimited"],
             required:true,
         },
         count: {
@@ -51,7 +50,7 @@ const userSchema = new Schema({
             required:true,
             default: 1
         },
-        select: false
+        // select: false
     }],
     myStore:{
         type: Schema.Types.ObjectId,
@@ -79,6 +78,6 @@ userSchema.virtual("planExpiresInDays").get(function(){
         OR MAYBE NOT??? LET'S TRY IT FIRST THEN DECIDE 👍🏻*/
 });
 
-const User = model("User", userSchema);
+const User = models?.User || model("User", userSchema);
 
 export default User;

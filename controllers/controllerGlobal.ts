@@ -18,26 +18,12 @@ export const getAll= withDBConnection(async(Model:string, filter?:{}) => {
 //      If I used a controller called getOne() for all of the models then I would have had to write an if-else to
 //     determine whether to use find({email}) or findById().
 export const getUser = withDBConnection( async(email: string) => {
-  console.log("getUser",email);
+
   const user = await Auth.find({discordEmail: email});
   // console.log("getUser", typeof user); // prints object
-
-  return JSON.parse(JSON.stringify(user)); // NOTE: to extract the _id:new ObjectId('67c43f535c8da8d1edff3aa1')
+  return JSON.parse(JSON.stringify(user)); // NOTE: to convert the _id:new ObjectId('67c43f535c8da8d1edff3aa1') to be a string
   
 });
-
-export async function getUserNew(email:string) {
-  try {
-    // await dbStartConnection();
-    const user = await Auth.find({discordEmail: email});
-  // console.log("getUser", typeof user); // prints object
-
-  return user;
-
-  } catch (error) {
-    
-  }
-}
 
 export const updateUser = withDBConnection(async(email: string, formDate:FormData) => {
  // NOTE the updateUserAuth is going to be inside the authActions.ts

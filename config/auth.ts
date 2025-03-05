@@ -1,4 +1,4 @@
-//@ts-nocheck
+
 /*
 NOTE: This is where you can control the behaviour of the library 
 and specify custom authentication logic, adapters, etc.
@@ -8,9 +8,8 @@ import NextAuth, { type DefaultSession } from "next-auth";
 import Discord from "next-auth/providers/discord";
 
 // import authConfig from "./auth.config";
-import { createNewUser } from "@/actions/authActions";
+import { createUserAuth } from "@/actions/authActions";
 import { getUser } from "@/controllers/controllerGlobal";
-import Auth from "@/models/authModel";
 
 // By default, the `id` property does not exist on `session` of async session({ session, user})
 // See the [TypeScript](https://authjs.dev/getting-started/typescript) on how to add it.
@@ -53,10 +52,17 @@ const authConfig = NextAuth({
         if (typeof user.email !== "string") return false; // to solve => Argument of type 'string | null | undefined' is not assignable to parameter of type 'string'.
         // 1) look up for the sam email in the db
         const isExist = await getUser(user.email);
-        // console.log("isExist", !!isExist, isExist);
+        /* OLD CODE (kept for reference): 
+          if (!isExist) await createNewUser(user);
+          the statement above was not work since the getUser() return an empty array [].
+          in javascript [] and {} are falsy but non-nullish value
+          if course !isExist prints false bu the if condition behaves differently:
+          if (!isExist) is effectively if (![]), which does not trigger because [] is a truthy value.
+          the syntax !isExist ONLY WORKS with undefined and null
+        */
 
         // 2) if not exist then create a new user
-        if (!isExist) await createNewUser(user);
+        if (isExist.length === 0) await createUserAuth(user);
         return true;
       } catch (error) {
         return false;
@@ -65,19 +71,20 @@ const authConfig = NextAuth({
       }
     },
     async session({ session }) {
+      console.log("SESSION CALLBACK ⏳");
       const currentUser = await getUser(session?.user.email);
       // console.log("currentUser🔴", currentUser, typeof currentUser);
 
       // 1) adding the role and the id to the session info:
       session.user.id = currentUser[0]._id;
       session.user.userType = currentUser[0].userType;
-      console.log(session);
+      console.log("⏳⏳⏳",session);
 
       // console.log("the working session FINALLY", session);
       return session;
     },
   },
-  // ...authConfig,
+
   /*NOTE:
         I face a problem where the app took me directly to the auth.js default page to login using discord
         and didn't show the home page either the login page with the button of discord I created
