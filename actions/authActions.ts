@@ -10,13 +10,14 @@ export async function discordSignIn() {
 }
 
 export const createUserAuth = withDBConnection( async(newUser) => {
+    console.log("before create", newUser);
     const user = await User.create({
         discordId: newUser.id,
         discordEmail: newUser.email,
-        discordName: newUser.name,
+        username: newUser.name,
         image: newUser.image
     });
-    console.log("createNewUser🎭", user.name);
+    console.log("createNewUser🎭", user.username);
     // NOTE: I think there is no need to return the newly created usr because the signIn callback only returns boolean
     // return user;
 });

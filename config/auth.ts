@@ -48,10 +48,13 @@ const authConfig = NextAuth({
     },
 
     async signIn({ user }) {
+      console.log("SIGN IN CALLBACK");
       try {
         if (typeof user.email !== "string") return false; // to solve => Argument of type 'string | null | undefined' is not assignable to parameter of type 'string'.
         // 1) look up for the sam email in the db
         const isExist = await getUser(user.email);
+        console.log("isExist", isExist, isExist.length === 0);
+
         /* OLD CODE (kept for reference): 
           if (!isExist) await createNewUser(user);
           the statement above was not work since the getUser() return an empty array [].

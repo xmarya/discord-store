@@ -11,9 +11,11 @@ const userSchema = new Schema({
         required: true,
         unique: true,
     },
-    discordName: {
+    username: {
         type: String,
-        required: true,
+        required: [true, "the username field is required"],
+        unique: true,
+        trim: true
     },
     userType: {
         /* SOLILOQUY: 
@@ -74,13 +76,6 @@ const userSchema = new Schema({
             }
         }
     }],
-
-    username: {
-        type: String,
-        required: [true, "the username field is required"],
-        unique: true,
-        trim: true
-    },
     subscribedPlanDetails: {
         name: {
             type: String,
