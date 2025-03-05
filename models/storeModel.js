@@ -1,4 +1,4 @@
-import { Schema, model } from "mongoose";
+import { Schema, model, models } from "mongoose";
 
 const storeSchema = new Schema({
   storeName: {
@@ -99,6 +99,6 @@ storeSchema.virtual("reviews", {
 
 /* SOLILOQUY: I think the profits/stats should be virtual too */
 
-const Store = model("Store", storeSchema);
+const Store = models?.Store || model("Store", storeSchema);
 
 export default Store;

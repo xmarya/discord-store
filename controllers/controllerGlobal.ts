@@ -1,13 +1,9 @@
 "use server"
 
-import Auth from "@/models/authModel";
+import User from "@/models/userModel";
 import { withDBConnection } from "@/utils/controllerWrapper";
 import mongoose from "mongoose";
 
-export const createNewDoc = withDBConnection(async () => {
-  console.log("createNewDoc");
-
-});
 
 export const getAll= withDBConnection(async(Model:string, filter?:{}) => {
 
@@ -19,15 +15,22 @@ export const getAll= withDBConnection(async(Model:string, filter?:{}) => {
 //     determine whether to use find({email}) or findById().
 export const getUser = withDBConnection( async(email: string) => {
 
-  const user = await Auth.find({discordEmail: email});
-  // console.log("getUser", typeof user); // prints object
+  const user = await User.find({discordEmail: email});
+
   return JSON.parse(JSON.stringify(user)); // NOTE: to convert the _id:new ObjectId('67c43f535c8da8d1edff3aa1') to be a string
   
 });
 
-export const updateUser = withDBConnection(async(email: string, formDate:FormData) => {
- // NOTE the updateUserAuth is going to be inside the authActions.ts
-});
+export const getMyStore = withDBConnection( async(userId: string) => {
+  // NOTE: get my store(for the owner and the assistant) is different from get store (for other users to view/shop)
+  const userStore = await User.findById(userId).select("myStore");
+  if(!userStore) return null;
+
+  console.log("getMyStore", userStore);
+
+  return userStore;
+})
+
 
 export const getOne = withDBConnection( async(Model: string, id: string) => {
   const doc = await mongoose.model(Model).findById(id);
