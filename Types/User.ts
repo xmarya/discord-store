@@ -1,13 +1,21 @@
 import { Types } from "mongoose";
 import { Plan } from "./Plan";
 
+export interface UserBasic {
+  discordId: string;
+  discordEmail: string;
+  username: string;
+  userType: string;
+  image: string;
+  createdAt:Date
+} 
 
 export interface UserPlan extends Plan {
     subscribeStarts?:Date,
     subscribeEnds?:Date,
 }
 
-export interface UserOptionals extends UserPlan {
+export interface UserOptionals {
     bankAccount?:[
         {
             cardName:string
@@ -26,14 +34,7 @@ export interface UserOptionals extends UserPlan {
     myStore?:Types.ObjectId,
 }
 
-export interface UserDocument extends UserOptionals {
-    discordId: string;
-    discordEmail: string;
-    username: string;
-    userType: string;
-    image: string;
-    createdAt:Date
-  } 
+export type UserDocument = UserBasic & UserOptionals & UserPlan;
 
 
 

@@ -21,3 +21,5 @@ export interface PlanQuota extends Plan {
   };
 }
 
+export type PlanDocument = Plan & PlanDetails & PlanQuota;
+
