@@ -1,5 +1,5 @@
-import { Model, Schema, model, models } from "mongoose";
 import { UserDocument } from "@/Types/User";
+import { Model, Schema, model, models } from "mongoose";
 
 // UserModel is only used when creating the Mongoose model at the last of the file (after creating the Schema).
 type UserModel = Model<UserDocument>;

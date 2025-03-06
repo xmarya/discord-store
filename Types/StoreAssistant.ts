@@ -1,0 +1,26 @@
+import { Types } from "mongoose";
+
+
+export interface StoreAssistantBasic {
+    assistant: Types.ObjectId;
+    inStore: Types.ObjectId;
+    permissions: AssistantPermissions;
+  }
+
+
+export interface AssistantPermissions {
+  changePrice: boolean;
+  addProduct: boolean;
+  editProduct: boolean;
+  deleteProduct: boolean;
+  addCategory: boolean;
+  editCategory: boolean;
+  deleteCategory: boolean;
+  addDiscount: boolean;
+  editDiscount: boolean;
+  changeStoreSettings: boolean;
+  previewStoreStats: boolean;
+}
+
+export type StoreAssistantDocument = StoreAssistantBasic;
+
