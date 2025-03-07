@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
 
 
-export interface StoreAssistantBasic {
+export interface StoreAssistant {
     assistant: Types.ObjectId;
     inStore: Types.ObjectId;
     permissions: AssistantPermissions;
@@ -22,5 +22,5 @@ export interface AssistantPermissions {
   previewStoreStats: boolean;
 }
 
-export type StoreAssistantDocument = StoreAssistantBasic;
+export type StoreAssistantDocument = StoreAssistant;
 

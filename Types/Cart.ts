@@ -1,6 +1,6 @@
 import { Types } from "mongoose";
 
-export interface CartBasic {
+export interface Cart {
   user: Types.ObjectId;
   productsList: [
     {
@@ -15,4 +15,4 @@ export interface CartBasic {
   total: number;
 }
 
-export type CartDocument = CartBasic;
+export type CartDocument = Cart;

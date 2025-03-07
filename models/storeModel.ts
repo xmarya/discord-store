@@ -82,6 +82,10 @@ const storeSchema = new Schema<StoreDocument>({
     required: [true, "the storeState is required"],
     default: "inProgress",
   },
+  verified: {
+    type:Boolean,
+    default: false
+  }
 });
 
 storeSchema.virtual<ProductDocument[]>("products", {

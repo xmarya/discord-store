@@ -1,7 +1,7 @@
 import { Types } from "mongoose";
 
 
-export interface ReviewBasic {
+export interface Review {
     user:Types.ObjectId,
     reviewBody:string,
     wroteAt:Date,
@@ -11,4 +11,4 @@ export interface ReviewBasic {
 
 }
 
-export type ReviewDocument = ReviewBasic;
+export type ReviewDocument = Review;
