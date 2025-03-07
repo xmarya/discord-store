@@ -14,6 +14,7 @@ const annualProfitSchema = new Schema<AnnualProfitDocument>({
     required: true,
   },
   totalProfit: {
+    //NOTE: the total of store's profit from establishing it (of all the years)
     type: Number,
     required: true,
   },
