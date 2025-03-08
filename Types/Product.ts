@@ -2,6 +2,7 @@ import { Types } from "mongoose";
 import { Category } from "./Category";
 
 export interface ProductBasic {
+  _id:string,
   name: string;
   price: number;
   quantity: number;

@@ -2,6 +2,7 @@ import { Types } from "mongoose";
 import { ProductDocument } from "./Product";
 
 export interface Invoice {
+  _id:string,
   purchaseId: String;
   buyer: Types.ObjectId;
   products: Array<ProductDocument>;

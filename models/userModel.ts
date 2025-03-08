@@ -1,22 +1,37 @@
 import { UserDocument } from "@/Types/User";
-import { Model, Schema, model, models } from "mongoose";
+import { Model, Query, Schema, model, models } from "mongoose";
 
 // UserModel is only used when creating the Mongoose model at the last of the file (after creating the Schema).
 type UserModel = Model<UserDocument>;
 
 // Schema<T> expects the first generic type to be an object containing ALL the schema fields.
 // The first argument for Schema<> should be the document type, not the model type.
-const userSchema = new Schema<UserDocument>(
-  {
-    discordId: {
+const userSchema = new Schema<UserDocument>({
+    email: {
       type: String,
-      required: true,
       unique: true,
+      required: [true, "the email field is required"],
     },
-    discordEmail: {
+    signMethod: {
       type: String,
-      required: true,
-      unique: true,
+      enum: ["credentials", "discord"],
+      required: [true, " the signMethod field is required"],
+    },
+    credentials: {
+      password: {
+        type: String,
+        minLength: [8, "your password must be at least 8 characters"],
+        select: false,
+      },
+      passwordConfirm: String, // NOTE: zod will be use to validate this filed
+      // on the front-end + the field itself won't be saved in the db.
+      // it's only use inside the pre hook to check the password
+      passwordResetToken: String,
+      passwordResetExpires: Date,
+      passwordChangedAt: Date,
+    },
+    discord: {
+      id: String,
     },
     username: {
       type: String,
@@ -161,20 +176,36 @@ const userSchema = new Schema<UserDocument>(
 // I decided to make this a virtual field, so it will be created and recalculated each time
 // the data is retrieved which maintains the accuracy of how many days exactly are left.
 userSchema.virtual("planExpiresInDays").get(function () {
-    if(!this.subscribeEnds || !this.subscribeStarts) return 0;
-  
-    const ms = this.subscribeEnds?.getTime() - this.subscribeStarts?.getTime();
-    return Math.floor(ms / (1000 * 60 * 60 * 24));
+  if (!this.subscribeEnds || !this.subscribeStarts) return 0;
+
+  const ms = this.subscribeEnds?.getTime() - this.subscribeStarts?.getTime();
+  return Math.floor(ms / (1000 * 60 * 60 * 24));
   /* CHANGE LATER: this must be changed to pre("save") hook since 
     I moved the subscribeEnds from Top-level field to be inside the planDetails object 
         OR MAYBE NOT??? LET'S TRY IT FIRST THEN DECIDE 👍🏻*/
 
-    // NOTE: this.subscribeEnds and this.subscribeStarts are Date objects, not numbers.
-    // TypeScript does not allow arithmetic (-) directly between Date objects.
-    // so, we'll convert them to a number by using getTime(), the result is going to be a timestamp in milliseconds
-    // we'll take it and convert it into a day by dividing by dividing by (1000 * 60 * 60 * 24) .
+  // NOTE: this.subscribeEnds and this.subscribeStarts are Date objects, not numbers.
+  // TypeScript does not allow arithmetic (-) directly between Date objects.
+  // so, we'll convert them to a number by using getTime(), the result is going to be a timestamp in milliseconds
+  // we'll take it and convert it into a day by dividing by dividing by (1000 * 60 * 60 * 24) .
 });
-                        // model(Document, Model)
+
+userSchema.pre(/^find/, function (this: Query<any, any>, next) {
+  this.populate("myStore");
+  next();
+});
+
+userSchema.pre("save", function (next) {
+  // mongoose documents require an explicit cast when dealing with nested objects (credential subdocument) inside hooks.
+  // Explicitly Casts `this` as UserDocument → This tells TypeScript that this has the credentials and discord fields.
+  const user = this as UserDocument;
+  if (user.signMethod !== "credentials" && !user.credentials) return next();
+
+  if (user?.credentials?.password !== user?.credentials?.passwordConfirm) return next(new Error("Passwords do not match"));
+
+  next();
+});
+// model(Document, Model)
 const User = models?.User || model<UserDocument, UserModel>("User", userSchema);
 
 export default User;

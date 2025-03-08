@@ -5,6 +5,7 @@ import { ReviewDocument } from "./Reviews";
 
 
 export interface StoreBasic {
+    _id:string,
     storeName:string,
     owner:Types.ObjectId,
     status: "inProgress"| "active"| "suspended"| "deleted",
