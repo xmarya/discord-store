@@ -1,5 +1,5 @@
 import { Types } from "mongoose";
-import { Category } from "./Category";
+import { CategoryDocument } from "./Category";
 
 export interface ProductBasic {
   _id:string,
@@ -7,7 +7,7 @@ export interface ProductBasic {
   price: number;
   quantity: number;
   image: Array<string>;
-  category: Array<Category>;
+  category: Array<CategoryDocument>;
   description: string;
   status: "inStock" | "outOfStock";
   store: Types.ObjectId;

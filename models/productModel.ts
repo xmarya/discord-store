@@ -22,13 +22,7 @@ const productSchema = new Schema<ProductDocument>(
       type: [String],
       required: [true, "the image field is required"],
     },
-    category: [
-      {
-        type: String,
-        required: [true, "the category field is required"],
-        unique: true,
-      },
-    ],
+    category:[Schema.Types.ObjectId],
     description: {
       type: String,
       required: [true, "the description field is required"],

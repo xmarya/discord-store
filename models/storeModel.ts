@@ -55,18 +55,7 @@ const storeSchema = new Schema<StoreDocument>({
       }],
       */
 
-  categories: [
-    {
-      name: {
-        type: String,
-        required: [true, "the category name is required"],
-        unique: true,
-        trim: true,
-      },
-      colour: String,
-      // ADD FEATURE: before allowing the user to add any category the plan's quota should be checked inside a pre("update") hook
-    },
-  ],
+  categories: [Schema.Types.ObjectId],
   colourTheme:
     {
       /* SOLILOQUY: this should be one object not an array, 
