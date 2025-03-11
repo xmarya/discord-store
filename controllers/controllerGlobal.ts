@@ -2,8 +2,9 @@
 
 import User from "@/models/userModel";
 import { withDBConnection } from "@/utils/controllerWrapper";
-import getFieldValuesArray from "@/utils/getFieldValuesArray";
-import mongoose, { Query } from "mongoose";
+import mongoose from "mongoose";
+console.log("THE HEAD OF GLOBAL CONTROLLER 🔴");
+
 
 
 export const getAll= withDBConnection(async(Model:string, filter?:{}) => {
@@ -14,7 +15,9 @@ export const getAll= withDBConnection(async(Model:string, filter?:{}) => {
 //      If I used a controller called getOne() for all of the models then I would have had to write an if-else to
 //     determine whether to use find({email}) or findById().
 export const getUser = withDBConnection( async(email: string) => {
-  const user = await User.find({discordEmail: email});
+  console.log("getUser 1", email);
+  const user = await User.find({email}).select("userType");
+  console.log("getUser 2",user);
 
   return JSON.parse(JSON.stringify(user)); // NOTE: to convert the _id:new ObjectId('67c43f535c8da8d1edff3aa1') to be a string
   

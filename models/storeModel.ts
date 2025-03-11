@@ -3,7 +3,6 @@ import { ReviewDocument } from "@/Types/Reviews";
 import { StoreDocument } from "@/Types/Store";
 import { Model, Schema, model, models } from "mongoose";
 
-
 type StoreModel = Model<StoreDocument>
 const storeSchema = new Schema<StoreDocument>({
   storeName: {

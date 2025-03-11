@@ -6,10 +6,9 @@ and specify custom authentication logic, adapters, etc.
 
 import NextAuth, { type DefaultSession } from "next-auth";
 import Discord from "next-auth/providers/discord";
-
-// import authConfig from "./auth.config";
-import { createUserAuth } from "@/actions/authActions";
 import { getUser } from "@/controllers/controllerGlobal";
+import { createUser } from "@/actions/mutation/user";
+
 
 // By default, the `id` property does not exist on `session` of async session({ session, user})
 // See the [TypeScript](https://authjs.dev/getting-started/typescript) on how to add it.
@@ -48,6 +47,7 @@ const authConfig = NextAuth({
     },
 
     async signIn({ user }) {
+      console.log("SIGNIN CALLBACK 🔎");
       try {
         if (typeof user.email !== "string") return false; // to solve => Argument of type 'string | null | undefined' is not assignable to parameter of type 'string'.
         // 1) look up for the sam email in the db
@@ -64,7 +64,7 @@ const authConfig = NextAuth({
         */
 
         // 2) if not exist then create a new user
-        if (isExist.length === 0) await createUserAuth(user);
+        if (isExist.length === 0) await createUser(user);
         return true;
       } catch (error) {
         return false;
@@ -73,7 +73,7 @@ const authConfig = NextAuth({
       }
     },
     async session({ session }) {
-      // console.log("SESSION CALLBACK ⏳");
+      console.log("SESSION CALLBACK ⏳");
       const currentUser = await getUser(session?.user.email);
       // console.log("currentUser🔴", currentUser, typeof currentUser);
 
