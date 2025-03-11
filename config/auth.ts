@@ -48,12 +48,11 @@ const authConfig = NextAuth({
     },
 
     async signIn({ user }) {
-      console.log("SIGN IN CALLBACK");
       try {
         if (typeof user.email !== "string") return false; // to solve => Argument of type 'string | null | undefined' is not assignable to parameter of type 'string'.
         // 1) look up for the sam email in the db
         const isExist = await getUser(user.email);
-        console.log("isExist", isExist, isExist.length === 0);
+        // console.log("isExist", isExist, isExist.length === 0);
 
         /* OLD CODE (kept for reference): 
           if (!isExist) await createNewUser(user);
@@ -74,14 +73,14 @@ const authConfig = NextAuth({
       }
     },
     async session({ session }) {
-      console.log("SESSION CALLBACK ⏳");
+      // console.log("SESSION CALLBACK ⏳");
       const currentUser = await getUser(session?.user.email);
       // console.log("currentUser🔴", currentUser, typeof currentUser);
 
       // 1) adding the role and the id to the session info:
       session.user.id = currentUser[0]._id;
       session.user.userType = currentUser[0].userType;
-      console.log("⏳⏳⏳",session);
+      // console.log("⏳⏳⏳",session);
 
       // console.log("the working session FINALLY", session);
       return session;

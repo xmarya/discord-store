@@ -2,11 +2,11 @@
 
 import User from "@/models/userModel";
 import { withDBConnection } from "@/utils/controllerWrapper";
-import mongoose from "mongoose";
+import getFieldValuesArray from "@/utils/getFieldValuesArray";
+import mongoose, { Query } from "mongoose";
 
 
 export const getAll= withDBConnection(async(Model:string, filter?:{}) => {
-
 });
 
 // NOTE: I decided to split the get/update controllers into one for the Auth and the another for the remaining models
@@ -14,9 +14,7 @@ export const getAll= withDBConnection(async(Model:string, filter?:{}) => {
 //      If I used a controller called getOne() for all of the models then I would have had to write an if-else to
 //     determine whether to use find({email}) or findById().
 export const getUser = withDBConnection( async(email: string) => {
-  console.log(email);
   const user = await User.find({discordEmail: email});
-  console.log(user);
 
   return JSON.parse(JSON.stringify(user)); // NOTE: to convert the _id:new ObjectId('67c43f535c8da8d1edff3aa1') to be a string
   
@@ -27,10 +25,17 @@ export const getMyStore = withDBConnection( async(userId: string) => {
   const userStore = await User.findById(userId).select("myStore");
   if(!userStore) return null;
 
-  console.log("getMyStore", userStore);
-
   return JSON.parse(JSON.stringify(userStore));
-})
+});
+
+export const getField = withDBConnection( async(Model:string, field:string):Promise<Array<string>> => {
+  const doc = await mongoose.model(Model).find().select(field);
+
+  // const fieldsArray = getFieldValuesArray(field, doc);
+  // console.log(fieldsArray);
+  return JSON.parse(JSON.stringify(doc));
+   
+});
 
 
 export const getOne = withDBConnection( async(Model: string, id: string) => {
