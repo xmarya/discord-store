@@ -1,130 +1,112 @@
 "use client";
 
-import { createStore } from "@/actions/authActions";
-import { FormBlock } from "@/Components/UI/Form/FromBlock";
-import { Label } from "@/Components/UI/Form/Label";
-import { Input } from "@/Components/UI/Form/Input";
 import FormSubmitButton from "@/Components/UI/Form/FormSubmitButton";
+import { FormBlock } from "@/Components/UI/Form/FromBlock";
+import { Input } from "@/Components/UI/Form/Input";
+import { Label } from "@/Components/UI/Form/Label";
+import { storeFields } from "@/data/storeFormFields";
 import { StoreBasic, StoreDocument } from "@/Types/Store";
+import { useActionState, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useActionState, useRef, useState, useTransition } from "react";
-import { Button } from "@/Components/UI/Button";
-import { Dialog } from "@/Components/UI/Dialog";
-import FormResetButton from "../UI/Form/FormResetButton";
-import toast from "react-hot-toast";
+import { Form } from "../UI/Form/Form";
 import { FormError } from "../UI/Form/FormError";
-
+import FormResetButton from "../UI/Form/FormResetButton";
 
 type namesObject = Pick<StoreBasic, "_id" | "storeName">;
 interface Props {
   store: StoreDocument;
-  availableNames:Array<namesObject>
+  availableNames: Array<namesObject>;
+  formAction: (prevState: void | null, formData: FormData) => Promise<void>;
 }
 
-export type FormState = { state: "success" | "fail"; message: string } | null;
+export default function StoreInfoForm({ store,availableNames,formAction}: Props) {
+  const { _id: storeId, storeName } = store;
 
-export default function StoreInfoForm({ store, availableNames }: Props) {
-  const heading = !store
-    ? "ليس لديك متجر بعد. أنشئ متجرك الآن!"
-    : "بيانات المتجر:";
-  const { _id: storeId, storeName, categories } = store;
   const {
     register,
     setError,
     clearErrors,
-    formState: { isSubmitting, isDirty, isValid ,errors: formErrors, }} = useForm({mode: "onBlur"});
-  // const [state, fromAction] = useActionState<FormState, FormData>(createStore, null);
-  // const [isPending, startTransition] = useTransition();
-  const dialogRef = useRef<HTMLDialogElement>(null);
+    formState: { errors: formErrors },
+  } = useForm({ mode: "onBlur" });
+
+  /* OLD CODE (kept for reference): 
+  this handlre to solve the no overload problem because any action that is being passed to useActionState MUST accept the preState (prevState: void | null) as the first argument
+  // const actionHandler = async (_: void | null, formData: FormData) => {
+    //   await formAction(formData);
+    // };
+    */
+  const [formState, action, isPending] = useActionState(formAction, null);
+
   const [disableSubmit, setDisableSubmit] = useState<boolean>(true);
 
-  function checkAvailability(event:React.FocusEvent<HTMLInputElement, Element> | undefined) {
+  function checkAvailability(
+    event: React.FocusEvent<HTMLInputElement, Element> | undefined
+  ) {
     // Guard clause 1) is it a newly created store with no name ?
-    if(!storeName) return;
+    // if (!storeName) return; // if this guard stays, then since the store is new,
+    // whatever the userInput would be it won't go through the other guards to be checked correctly.
 
     // it seems to me that event.currentTarget can't be used here since it's null,
     // the data is available inside event.target (confirmed by the dev tools console).
     const userInput = event?.target.value;
 
-    // Guard clause 2) is it empty ? 
-    if(!userInput || userInput.trim() === "") {
+    // Guard clause 2) is it empty ?
+    if (!userInput || userInput.trim() === "") {
       setError("storeName", {
         type: "custom",
-        message: "لابد من إضافة اسم للمتجر"
-      })
+        message: "لابد من إضافة اسم للمتجر",
+      });
       return;
     }
-    
+
     // Guard clause 3) did the user changed the current name to a new one ?
-    if(userInput === storeName) return;
+    if (userInput === storeName) return;
 
     // Guard clause 4) is the new name exist in the db names && is it associated with a different store if ?
-    const isTaken = availableNames.some(obj => obj.storeName === userInput && obj._id !== storeId);
-    
-    isTaken ? setError("storeName", {type: "custom", message:"اسم المتجر مستخدم بالفعل"}) : setDisableSubmit(false);
+    const isTaken = availableNames.some(
+      (obj) => obj.storeName === userInput && obj._id !== storeId
+    );
+
+    isTaken
+      ? setError("storeName", {
+          type: "custom",
+          message: "اسم المتجر مستخدم بالفعل",
+        })
+      : setDisableSubmit(false);
   }
 
   return (
-    <div>
-      <h3>{heading}</h3>
-
-      <form action={createStore}>
-        <FormBlock>
-          <Label>اسم المتجر:</Label>
+    <Form action={action}>
+      {storeFields.map(({ label, input }, index) => (
+        <FormBlock key={index}>
+          <Label htmlFor={label.htmlFor}>{label.text}</Label>
           <Input
-            {...register("storeName", {required: "هذا الحقل إجباري"})}
-            type="text"
-            maxLength={12}
-            defaultValue={storeName}
-            placeholder="اسم متجرك"
-            required
+            {...register(
+              input.name,
+              input.required && {
+                required: input.required.requiredMessage,
+              }
+            )}
+            type={input.type}
+            defaultValue={storeName || ""}
+            placeholder={input.placeholder}
             // onBlur={checkAvailability} throws an error of no overload
             onBlur={(event) => checkAvailability(event)}
-            onClick={() => clearErrors("storeName")}
+            onClick={() => clearErrors(input.name)}
           />{" "}
           <FormError $hasError={!!formErrors?.storeName?.message}>
             {/* I had to use typeof === string to get rid of no overlap matches error */}
-            {typeof formErrors?.storeName?.message === "string" ? formErrors?.storeName?.message : ""}
+            {typeof formErrors?.storeName?.message === "string"
+              ? formErrors?.storeName?.message
+              : ""}
           </FormError>
-          {
-            // when the input lose the focus, a function to check if the current store name is already included in the fetched array or not
-            // but how to mark the input field as an error so the form can't be submitted?
-          }
         </FormBlock>
-        <FormBlock>
-          {/* disable the submit button in case of any error */}
-          <FormSubmitButton condition={disableSubmit}>حفظ</FormSubmitButton>
-          <FormResetButton>مسح</FormResetButton>
-        </FormBlock>
-      </form>
-
-      <Dialog
-        ref={
-          dialogRef
-        } /*{onSuspend={action to update the store categories and reflect the changes on the UI}}*/
-      >
-        <form method="dialog">
-          <FormBlock>
-            <Label>اسم الفئة:</Label>
-            <Input {...register("categoryName-1")} type="text" />
-            <Label>لون الفئة:</Label>
-            <Input {...register("categoryColour-1")} type="color" />
-          </FormBlock>
-          <FormBlock>
-            <Button formMethod="dialog" type="button" value="submit">
-              حفظ
-            </Button>
-            <Button
-              formMethod="dialog"
-              type="button"
-              onClick={() => dialogRef?.current?.close()}
-            >
-              إغلاق
-            </Button>
-          </FormBlock>
-        </form>
-      </Dialog>
-    </div>
+      ))}
+      <FormSubmitButton condition={disableSubmit}>
+        {isPending ? "جاري الحفظ..." : "حفظ"}
+      </FormSubmitButton>
+      <FormResetButton aria-disabled={isPending}>مسح</FormResetButton>
+    </Form>
   );
 }
 

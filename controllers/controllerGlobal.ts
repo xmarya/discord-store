@@ -17,7 +17,6 @@ export const getAll= withDBConnection(async(Model:string, filter?:{}) => {
 export const getUser = withDBConnection( async(email: string) => {
   console.log("getUser 1", email);
   const user = await User.find({email}).select("userType");
-  console.log("getUser 2",user);
 
   return JSON.parse(JSON.stringify(user)); // NOTE: to convert the _id:new ObjectId('67c43f535c8da8d1edff3aa1') to be a string
   

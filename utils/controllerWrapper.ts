@@ -1,5 +1,6 @@
 import { dbStartConnection } from "@/config/db";
 import { AppError } from "./AppError";
+import mongoose from "mongoose";
 
             /* 3- accepts the passed Generic and use it to type my parameters*/
 type Controller <Args extends any[]> = (...args: Args) => any;
@@ -16,6 +17,7 @@ type Controller <Args extends any[]> = (...args: Args) => any;
 
                             /* 1- receives a Generic called Args*/     /* 2- sends the Generic to Controller */
 export const withDBConnection = <Args extends any[]> (Controller:Controller<Args>):(...args:Args) => Promise<any> => {
+
     return async (...args: Args) => {
     try {
       await dbStartConnection();
@@ -25,6 +27,7 @@ export const withDBConnection = <Args extends any[]> (Controller:Controller<Args
         and the code execution proceeds bypassing the `await` inside the controller itself. Instead, 
         it resolves immediately, returning undefined before the inner promise resolves.
        */
+        // console.log(mongoose.modelNames());
       return await Controller(...args);
     } catch (error) {
       console.log("inside withDBConnection catch block");

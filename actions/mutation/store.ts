@@ -4,9 +4,8 @@ import { auth } from "@/config/auth";
 import { withDBConnection } from "@/utils/controllerWrapper";
 import Store from "@/models/storeModel";
 import User from "@/models/userModel";
-import { InitialState } from "@/Components/Blocks/StoreInfoForm";
 
-export const createStore = withDBConnection(async (prevState:InitialState, formData: FormData) => {
+export const createStore = withDBConnection(async (formData: FormData) => {
 
   // the newStore probably if got from the formData, the userId from the session
   const session = await auth();
@@ -22,5 +21,11 @@ export const createStore = withDBConnection(async (prevState:InitialState, formD
   await User.findByIdAndUpdate(userId, { myStore: newStore._id });
 });
 
-export const updateStore = withDBConnection(async (prevState:InitialState, formData: FormData) => {
+export const updateStore = withDBConnection(async (storeId:string, formData: FormData) => {
+
+  // 1) getting the storeId
+
+  // 2) pass in ONLY the editable data
+
+  // 3) revalidate the path
 });
