@@ -4,7 +4,7 @@ import FormSubmitButton from "@/Components/UI/Form/FormSubmitButton";
 import { FormBlock } from "@/Components/UI/Form/FromBlock";
 import { Input } from "@/Components/UI/Form/Input";
 import { Label } from "@/Components/UI/Form/Label";
-import { storeFields } from "@/data/storeFormFields";
+import { storeFields } from "@/_data/storeFormFields";
 import { StoreBasic, StoreDocument } from "@/Types/Store";
 import { useActionState, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -20,7 +20,7 @@ interface Props {
 }
 
 export default function StoreInfoForm({ store,availableNames,formAction}: Props) {
-  const { _id: storeId, storeName } = store;
+  const {_id:storeId, storeName} = store || "";
 
   const {
     register,
@@ -39,9 +39,11 @@ export default function StoreInfoForm({ store,availableNames,formAction}: Props)
 
   const [disableSubmit, setDisableSubmit] = useState<boolean>(true);
 
-  function checkAvailability(
-    event: React.FocusEvent<HTMLInputElement, Element> | undefined
-  ) {
+  function checkAvailability(event: React.FocusEvent<HTMLInputElement, Element> | undefined) {
+
+    // Reset the state to disable the button:
+    setDisableSubmit(true);
+
     // Guard clause 1) is it a newly created store with no name ?
     // if (!storeName) return; // if this guard stays, then since the store is new,
     // whatever the userInput would be it won't go through the other guards to be checked correctly.
@@ -88,7 +90,7 @@ export default function StoreInfoForm({ store,availableNames,formAction}: Props)
               }
             )}
             type={input.type}
-            defaultValue={storeName || ""}
+            defaultValue={storeName}
             placeholder={input.placeholder}
             // onBlur={checkAvailability} throws an error of no overload
             onBlur={(event) => checkAvailability(event)}
@@ -102,6 +104,7 @@ export default function StoreInfoForm({ store,availableNames,formAction}: Props)
           </FormError>
         </FormBlock>
       ))}
+      {storeId && <Input type="hidden" defaultValue={storeId} name="storeId"/>}
       <FormSubmitButton condition={disableSubmit}>
         {isPending ? "جاري الحفظ..." : "حفظ"}
       </FormSubmitButton>

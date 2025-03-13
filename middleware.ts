@@ -6,12 +6,12 @@
 //     return NextResponse.redirect(new URL("/redirect", request.url));
 // }
 
-import { auth } from "./config/auth"; 
+import { auth } from "./_config/auth";
 
 export const middleware = auth;
 
 export const config = {
-  runtime: 'nodejs',
+  runtime: "nodejs",
   matcher: [
     "/dashboard",
 

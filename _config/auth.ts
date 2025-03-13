@@ -1,4 +1,3 @@
-
 /*
 NOTE: This is where you can control the behaviour of the library 
 and specify custom authentication logic, adapters, etc.
@@ -6,9 +5,8 @@ and specify custom authentication logic, adapters, etc.
 
 import NextAuth, { type DefaultSession } from "next-auth";
 import Discord from "next-auth/providers/discord";
-import { getUser } from "@/controllers/controllerGlobal";
-import { createUser } from "@/actions/mutation/user";
-
+import { getUser } from "@/_actions/controllerGlobal";
+import { createUser } from "@/_actions/mutation/user";
 
 // By default, the `id` property does not exist on `session` of async session({ session, user})
 // See the [TypeScript](https://authjs.dev/getting-started/typescript) on how to add it.
@@ -53,6 +51,7 @@ const authConfig = NextAuth({
         // 1) look up for the sam email in the db
         const isExist = await getUser(user.email);
         // console.log("isExist", isExist, isExist.length === 0);
+        //TODO: if not exist => forward the user to the plan page to select one and pay for it then create a new user
 
         /* OLD CODE (kept for reference): 
           if (!isExist) await createNewUser(user);

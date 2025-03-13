@@ -1,7 +1,7 @@
-import StyledComponentsRegistry from "@/styles/registry";
+import StyledComponentsRegistry from "@/_styles/registry";
 import type { Metadata } from "next";
 import { Toaster } from "react-hot-toast";
-import "@/styles/globals.css";
+import "@/_styles/globals.css";
 
 export const metadata: Metadata = {
   title: "Create Next App",

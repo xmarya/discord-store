@@ -1,6 +1,5 @@
-import { withDBConnection } from "@/utils/controllerWrapper";
+import { withDBConnection } from "@/_utils/controllerWrapper";
 import User from "@/models/userModel";
-
 
 export const createUser = withDBConnection(async (newUser) => {
   console.log("before create", newUser);
