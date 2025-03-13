@@ -94,8 +94,7 @@ storeSchema.virtual<ReviewDocument[]>("reviews", {
   foreignField: "reviewedModel"
 });
 
-/* SOLILOQUY: I think the profits/stats should be virtual too */
-
+//TODO: post save to create categories if there any
 const Store = models?.Store || model<StoreDocument, StoreModel>("Store", storeSchema);
 
 export default Store;

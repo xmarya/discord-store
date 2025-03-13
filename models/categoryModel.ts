@@ -9,7 +9,7 @@ const categorySchema = new Schema<CategoryDocument>({
     },
     colour: {
         type:String,
-        required: [true, "the category colour is required"]
+        required: [true, "the category colour is required"],
     },
     store:Schema.Types.ObjectId,
     products: [Schema.Types.ObjectId]

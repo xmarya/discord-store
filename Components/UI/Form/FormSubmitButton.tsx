@@ -15,6 +15,7 @@ type Props = {
 export default function FormSubmitButton({children, condition}:Props) {
   const {pending} = useFormStatus();
   const isDisabled = pending || condition;
+  console.log("isDisabled", isDisabled);
   return (
     <SubmitButton aria-disabled={isDisabled} disabled={isDisabled}>
       {children}

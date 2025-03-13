@@ -10,4 +10,5 @@ export const FormBlock = styled.div`
     /* flex-wrap: wrap; it think there is need for wrapping property in case of using column direction */
     gap: 0.8rem;
     margin-block: 1.4rem;
+    background-color: orange;
 `;

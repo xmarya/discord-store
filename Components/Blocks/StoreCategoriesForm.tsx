@@ -1,13 +1,15 @@
 "use client"
 
-import { CategoryBasic } from "@/Types/Category";
+import { Category } from "@/Types/Category";
 import TagsInput from "./TagsInput";
 
-export default function StoreCategoriesForm({categories}) {
+type Props = {
+    categories:Array<Category> | []
+}
+
+export default function StoreCategoriesForm({categories}:Props) {
     return (
-        <div>
-            <TagsInput tags={categories} getTagValue={cat => cat.name}/>
-        </div>
+        <TagsInput tags={categories} getTagValue={cat => cat.name}/>
     )
 }
 

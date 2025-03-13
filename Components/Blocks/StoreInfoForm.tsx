@@ -6,11 +6,12 @@ import { Input } from "@/Components/UI/Form/Input";
 import { Label } from "@/Components/UI/Form/Label";
 import { storeFields } from "@/_data/storeFormFields";
 import { StoreBasic, StoreDocument } from "@/Types/Store";
-import { useActionState, useState } from "react";
+import { useActionState } from "react";
 import { useForm } from "react-hook-form";
 import { Form } from "../UI/Form/Form";
 import { FormError } from "../UI/Form/FormError";
 import FormResetButton from "../UI/Form/FormResetButton";
+import { useFormStore } from "@/hooks/formStore";
 
 type namesObject = Pick<StoreBasic, "_id" | "storeName">;
 interface Props {
@@ -20,7 +21,7 @@ interface Props {
 }
 
 export default function StoreInfoForm({ store,availableNames,formAction}: Props) {
-  const {_id:storeId, storeName} = store || "";
+  const {_id:storeId, storeName, categories} = store || "";
 
   const {
     register,
@@ -37,12 +38,13 @@ export default function StoreInfoForm({ store,availableNames,formAction}: Props)
     */
   const [formState, action, isPending] = useActionState(formAction, null);
 
-  const [disableSubmit, setDisableSubmit] = useState<boolean>(true);
+  const {setHasError, dirtyForm} = useFormStore();
+  console.log("dirtyForm", dirtyForm);
 
   function checkAvailability(event: React.FocusEvent<HTMLInputElement, Element> | undefined) {
 
     // Reset the state to disable the button:
-    setDisableSubmit(true);
+    setHasError(true);
 
     // Guard clause 1) is it a newly created store with no name ?
     // if (!storeName) return; // if this guard stays, then since the store is new,
@@ -74,11 +76,14 @@ export default function StoreInfoForm({ store,availableNames,formAction}: Props)
           type: "custom",
           message: "اسم المتجر مستخدم بالفعل",
         })
-      : setDisableSubmit(false);
+      : setHasError(false);
+
   }
 
   return (
     <Form action={action}>
+      {storeId && <Input type="hidden" defaultValue={storeId} name="storeId"/>}
+
       {storeFields.map(({ label, input }, index) => (
         <FormBlock key={index}>
           <Label htmlFor={label.htmlFor}>{label.text}</Label>
@@ -104,8 +109,7 @@ export default function StoreInfoForm({ store,availableNames,formAction}: Props)
           </FormError>
         </FormBlock>
       ))}
-      {storeId && <Input type="hidden" defaultValue={storeId} name="storeId"/>}
-      <FormSubmitButton condition={disableSubmit}>
+      <FormSubmitButton condition={dirtyForm}>
         {isPending ? "جاري الحفظ..." : "حفظ"}
       </FormSubmitButton>
       <FormResetButton aria-disabled={isPending}>مسح</FormResetButton>
@@ -126,11 +130,3 @@ export default function StoreInfoForm({ store,availableNames,formAction}: Props)
 // type="submit" submits the form. value="submit" is just data that can be sent when the form is submitted.
 // Also,the button with value="submit" does not submit the form but is likely used inside a <dialog> element,
 // where it closes the dialog and sends back the from data.
-
-/*
-  الحل الأول إني أفصل النموذجين
-  أو أني أفصل كل بيانات في خانة منفصلة كل وحدة لها نموذجها
-  أو إني أضيف فنكشن وحدة للفورم بداخلها يتم تنفيذ الأكشن حق بيانات المتجر و الثانية حقت بيانات الفئة 
-  أو اضيف زرين كل واحد له onClick()
-  تنفذ اكشن مختلف
-*/

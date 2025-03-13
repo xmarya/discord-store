@@ -15,6 +15,7 @@ export const createStore = withDBConnection(async (formData: FormData) => {
   const newStore = await Store.create({
     storeName: formData.get("storeName"),
     owner: userId,
+    // categories if there, then on post save hook I'll create new Category
   });
 
   // STEP 2) link it with the user using userId:
@@ -33,6 +34,5 @@ export const updateStore = withDBConnection(async (formData: FormData) => {
     });
     // STEP 2) revalidate the path
     revalidatePath("/dashboard/myStore");
-
   }
 );
