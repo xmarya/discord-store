@@ -1,24 +1,27 @@
+import { StoreDocument } from "@/Types/Store";
 import {create} from "zustand";
 
-// general store for forms states
-// export type Form = {
-//     validForm:boolean, // for the two forms
-// }
-// export type State = {
-//     allowSubmit:boolean, // for the button
-//     // validForm:boolean, // for the two forms
-// }
 
 export type StoreState = {
+    storeData:Partial<StoreDocument> | null,
     dirtyForm:boolean,
     setHasError: (hasError:boolean) => void,
+    setStoreData:(fromData:FormData) => void
 }
 
 export const useFormStore = create<StoreState>((set) => ({
+    storeData:null,
     dirtyForm:true,
+    setStoreData: (formData:FormData) => set( (currentState) => ({
+       storeData: {
+        ...currentState.storeData,
+        formData
+       }
+    })),
     setHasError: (hasError:boolean) => set((currentState) => ({
         ...currentState,
         dirtyForm: hasError ? true : false
-    }) ),
+    }),
+),
 }));
 

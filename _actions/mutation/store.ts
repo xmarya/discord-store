@@ -10,10 +10,12 @@ export const createStore = withDBConnection(async (formData: FormData) => {
   // the newStore probably if got from the formData, the userId from the session
   const session = await auth();
   const userId = session?.user.id;
+  const {storeName, categories} = Object.fromEntries(formData);
 
   // STEP 1) create the new store:
   const newStore = await Store.create({
-    storeName: formData.get("storeName"),
+    // storeName: formData.get("storeName"),
+    storeName,
     owner: userId,
     // categories if there, then on post save hook I'll create new Category
   });
@@ -26,7 +28,7 @@ export const createStore = withDBConnection(async (formData: FormData) => {
 });
 
 export const updateStore = withDBConnection(async (formData: FormData) => {
-  const storeId = formData.get("storeId");
+  const {storeId, storeName, categories} = Object.fromEntries(formData);
 
   // STEP 1) pass in ONLY the editable data:
     await Store.findByIdAndUpdate(storeId, {

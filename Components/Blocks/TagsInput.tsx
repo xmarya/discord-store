@@ -5,13 +5,16 @@ import { FaEllipsisVertical } from "react-icons/fa6";
 import { useState } from "react";
 import { Category } from "@/Types/Category";
 import { Label } from "../UI/Form/Label";
-import { Form } from "../UI/Form/Form";
 import { FormBlock } from "../UI/Form/FromBlock";
+import { useFormStore } from "@/hooks/formStore";
+import { FormError } from "../UI/Form/FormError";
+import { useFormContext } from "react-hook-form";
 
 
 const TagInputWrapper = styled.div`
   display: flex;
   gap: 1.2rem;
+  background-color: pink;
 `;
 
 const TagInput = styled.input.attrs({ type: "text" })``;
@@ -20,6 +23,7 @@ const TagsList = styled.ul`
   display: inline-flex;
   flex-wrap: wrap;
   gap: 0.8rem;
+  background-color: olivedrab;
 `;
 
 type Props<T extends Category> = {
@@ -32,7 +36,8 @@ export default function TagsInput<T extends Category>({tags,getTagValue,}: Props
   //     // the useOptimistic call back only job is returning the optimisticState
   //     return [...(currentTags || []), newTag]; // OR (currentTags?.length ? currentTags : [])
   // });
-
+  const {register, setError, clearErrors, formState:{errors: formErrors}} = useFormContext();
+  const {setHasError, setStoreData, storeData} = useFormStore();
   const [tagState, setTagState] = useState<Array<T> | undefined>(tags);
   const planQuota = 4;
 
@@ -52,27 +57,35 @@ export default function TagsInput<T extends Category>({tags,getTagValue,}: Props
 
   function handleDeleteTag(tag: string) {}
 
-  function handleKeyDown(
-    event: React.KeyboardEvent<HTMLInputElement>,
-    userInput: EventTarget & HTMLInputElement
-  ) {
+  function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>,userInput: EventTarget & HTMLInputElement) {
     const tagText = userInput.value;
     if (event.key !== "Enter" || tagText === "") return;
 
     event.preventDefault(); // prevent the default behaviour + adding a new line.
-    // the same as => const value = getTagValue(tag) => value === newTag
-    if (
-      (tagState?.length ?? 0) <= planQuota && tagText.trim() !== "" && !tagState?.some((t) => t.name === tagText)) {
-      handleAddTag(tagText);
-      // after adding the tag, clear the input preparing to accept the next one:
-      userInput.value = "";
+    if ((tagState?.length ?? 0) <= planQuota && tagText.trim() !== "") {
+
+      // the same as => const value = getTagValue(tag) => value === newTag
+      if(tagState?.some((t) => t.name === tagText)) {
+        setError("tagInput", {
+          type:"custom",
+          message: "لا يمكن اضافة نفس الفئة مجددًا"
+        });
+        userInput.value = "";
+      }
+      else {
+        handleAddTag(tagText);
+        clearErrors("tagInput");
+        // after adding the tag, clear the input preparing to accept the next one:
+        userInput.value = "";
+        setHasError(false);
+      }
     }
   }
 
   return (
-    <Form>
+    <>
       <FormBlock>
-      <Label htmlFor="tag-input">فئات المنتجات:</Label>
+        <Label htmlFor="tagInput">فئات المنتجات:</Label>
         <TagsList>
           {tagState?.map((t, index) => (
             <li key={index}>
@@ -85,7 +98,7 @@ export default function TagsInput<T extends Category>({tags,getTagValue,}: Props
         </TagsList>
         <TagInputWrapper>
         <TagInput
-          name="tag-input"
+        {...register("tagInput")}
           placeholder={
             (tagState?.length ?? 0) >= planQuota
               ? "بلغت الحد المسموح به"
@@ -98,8 +111,11 @@ export default function TagsInput<T extends Category>({tags,getTagValue,}: Props
             <span>{(tagState?.length ?? 0)} / {planQuota}</span>
         </div>
         </TagInputWrapper>
+        <FormError $hasError={!!formErrors?.tagInput?.message}>
+          {typeof formErrors?.tagInput?.message === "string" && formErrors?.tagInput?.message || ""}
+        </FormError>
       </FormBlock>
-    </Form>
+    </>
   );
 }
 

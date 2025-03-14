@@ -20,7 +20,6 @@ export default async function MyStore() {
         availableNames={names}
         formAction={myStore ? updateAction : createAction}
       />
-      {myStore && <StoreCategoriesForm categories={myStore.categories}/>}
     </>
   );
 }

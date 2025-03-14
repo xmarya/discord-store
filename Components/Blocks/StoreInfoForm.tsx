@@ -7,11 +7,12 @@ import { Label } from "@/Components/UI/Form/Label";
 import { storeFields } from "@/_data/storeFormFields";
 import { StoreBasic, StoreDocument } from "@/Types/Store";
 import { useActionState } from "react";
-import { useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { Form } from "../UI/Form/Form";
 import { FormError } from "../UI/Form/FormError";
 import FormResetButton from "../UI/Form/FormResetButton";
 import { useFormStore } from "@/hooks/formStore";
+import TagsInput from "./TagsInput";
 
 type namesObject = Pick<StoreBasic, "_id" | "storeName">;
 interface Props {
@@ -23,12 +24,12 @@ interface Props {
 export default function StoreInfoForm({ store,availableNames,formAction}: Props) {
   const {_id:storeId, storeName, categories} = store || "";
 
+  const methods = useForm({ mode: "onBlur" });
   const {
     register,
     setError,
     clearErrors,
-    formState: { errors: formErrors },
-  } = useForm({ mode: "onBlur" });
+    formState: { errors: formErrors }} = methods;
 
   /* OLD CODE (kept for reference): 
   this handlre to solve the no overload problem because any action that is being passed to useActionState MUST accept the preState (prevState: void | null) as the first argument
@@ -38,7 +39,7 @@ export default function StoreInfoForm({ store,availableNames,formAction}: Props)
     */
   const [formState, action, isPending] = useActionState(formAction, null);
 
-  const {setHasError, dirtyForm} = useFormStore();
+  const {setHasError, dirtyForm, setStoreData, storeData} = useFormStore();
   console.log("dirtyForm", dirtyForm);
 
   function checkAvailability(event: React.FocusEvent<HTMLInputElement, Element> | undefined) {
@@ -81,6 +82,8 @@ export default function StoreInfoForm({ store,availableNames,formAction}: Props)
   }
 
   return (
+    <FormProvider {...methods}>
+
     <Form action={action}>
       {storeId && <Input type="hidden" defaultValue={storeId} name="storeId"/>}
 
@@ -100,7 +103,7 @@ export default function StoreInfoForm({ store,availableNames,formAction}: Props)
             // onBlur={checkAvailability} throws an error of no overload
             onBlur={(event) => checkAvailability(event)}
             onClick={() => clearErrors(input.name)}
-          />{" "}
+            />{" "}
           <FormError $hasError={!!formErrors?.storeName?.message}>
             {/* I had to use typeof === string to get rid of no overlap matches error */}
             {typeof formErrors?.storeName?.message === "string"
@@ -109,11 +112,13 @@ export default function StoreInfoForm({ store,availableNames,formAction}: Props)
           </FormError>
         </FormBlock>
       ))}
+      <TagsInput tags={categories} getTagValue={cat => cat.name}/>
       <FormSubmitButton condition={dirtyForm}>
         {isPending ? "جاري الحفظ..." : "حفظ"}
       </FormSubmitButton>
       <FormResetButton aria-disabled={isPending}>مسح</FormResetButton>
     </Form>
+      </FormProvider>
   );
 }
 
