@@ -1,14 +1,14 @@
 import "@/models/storeModel"; // ✅ Make sure Store is registered before User
-import { UserDocument } from "@/Types/User";
+import { UserDocument } from "@/_Types/User";
 import { Model, Query, Schema, model, models } from "mongoose";
-
 
 // UserModel is only used when creating the Mongoose model at the last of the file (after creating the Schema).
 type UserModel = Model<UserDocument>;
 
 // Schema<T> expects the first generic type to be an object containing ALL the schema fields.
 // The first argument for Schema<> should be the document type, not the model type.
-const userSchema = new Schema<UserDocument>({
+const userSchema = new Schema<UserDocument>(
+  {
     email: {
       type: String,
       unique: true,
@@ -203,7 +203,8 @@ userSchema.pre("save", function (next) {
   const user = this as UserDocument;
   if (user.signMethod !== "credentials" && !user.credentials) return next();
 
-  if (user?.credentials?.password !== user?.credentials?.passwordConfirm) return next(new Error("Passwords do not match"));
+  if (user?.credentials?.password !== user?.credentials?.passwordConfirm)
+    return next(new Error("Passwords do not match"));
 
   next();
 });

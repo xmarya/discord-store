@@ -1,4 +1,4 @@
-import { CartDocument } from "@/Types/Cart";
+import { CartDocument } from "@/_Types/Cart";
 import { Model, Schema, model, models } from "mongoose";
 
 type CartModel = Model<CartDocument>;

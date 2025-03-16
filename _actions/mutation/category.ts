@@ -1,5 +1,5 @@
 import { withDBConnection } from "@/_utils/controllerWrapper";
-import { CategoryBasic } from "@/Types/Category";
+import { CategoryBasic } from "@/_Types/Category";
 
 export const createCategory = withDBConnection(
   async (category: CategoryBasic, storeId: string) => {

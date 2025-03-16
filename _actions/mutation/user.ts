@@ -2,7 +2,7 @@ import { withDBConnection } from "@/_utils/controllerWrapper";
 import User from "@/models/userModel";
 
 export const createUser = withDBConnection(async (newUser) => {
-  console.log("before create", newUser);
+  console.log("before create");
   const user = await User.create({
     email: newUser.email,
     username: newUser.name,

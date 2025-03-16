@@ -1,5 +1,5 @@
 import { Model, Schema, model, models } from "mongoose";
-import { ProductDocument } from "@/Types/Product";
+import { ProductDocument } from "@/_Types/Product";
 
 type ProductModel = Model<ProductDocument>;
 
@@ -22,7 +22,7 @@ const productSchema = new Schema<ProductDocument>(
       type: [String],
       required: [true, "the image field is required"],
     },
-    category:[Schema.Types.ObjectId],
+    category: [Schema.Types.ObjectId],
     description: {
       type: String,
       required: [true, "the description field is required"],

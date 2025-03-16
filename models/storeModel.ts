@@ -1,9 +1,9 @@
-import { ProductDocument } from "@/Types/Product";
-import { ReviewDocument } from "@/Types/Reviews";
-import { StoreDocument } from "@/Types/Store";
+import { ProductDocument } from "@/_Types/Product";
+import { ReviewDocument } from "@/_Types/Reviews";
+import { StoreDocument } from "@/_Types/Store";
 import { Model, Schema, model, models } from "mongoose";
 
-type StoreModel = Model<StoreDocument>
+type StoreModel = Model<StoreDocument>;
 const storeSchema = new Schema<StoreDocument>({
   storeName: {
     type: String,
@@ -55,15 +55,13 @@ const storeSchema = new Schema<StoreDocument>({
       */
 
   categories: [Schema.Types.ObjectId],
-  colourTheme:
-    {
-      /* SOLILOQUY: this should be one object not an array, 
+  colourTheme: {
+    /* SOLILOQUY: this should be one object not an array, 
       of course the plus users can views many theme but eventually they are going to select only one*/
-      type: Schema.Types.ObjectId,
-      ref:"ColourTheme",
-      // default:"default-theme" //SOLILOQUY:: is this how it should be defined ??
-
-    },
+    type: Schema.Types.ObjectId,
+    ref: "ColourTheme",
+    // default:"default-theme" //SOLILOQUY:: is this how it should be defined ??
+  },
   status: {
     type: String,
     enum: ["inProgress", "active", "suspended", "deleted"],
@@ -71,9 +69,9 @@ const storeSchema = new Schema<StoreDocument>({
     default: "inProgress",
   },
   verified: {
-    type:Boolean,
-    default: false
-  }
+    type: Boolean,
+    default: false,
+  },
 });
 
 storeSchema.virtual<ProductDocument[]>("products", {
@@ -83,18 +81,19 @@ storeSchema.virtual<ProductDocument[]>("products", {
 });
 
 storeSchema.virtual("stats", {
-  ref:"StoreStat",
+  ref: "StoreStat",
   localField: "_id",
-  foreignField: "store"
+  foreignField: "store",
 });
 
 storeSchema.virtual<ReviewDocument[]>("reviews", {
   ref: "Review",
-  localField:"_id",
-  foreignField: "reviewedModel"
+  localField: "_id",
+  foreignField: "reviewedModel",
 });
 
 //TODO: post save to create categories if there any
-const Store = models?.Store || model<StoreDocument, StoreModel>("Store", storeSchema);
+const Store =
+  models?.Store || model<StoreDocument, StoreModel>("Store", storeSchema);
 
 export default Store;

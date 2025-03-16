@@ -1,6 +1,5 @@
 import styled from "styled-components";
-import { Button } from "../Button";
-
+import { Button } from "../Buttons/Button";
 
 const ResetButton = styled(Button).attrs({ type: "reset" })`
   color: white;
@@ -8,15 +7,9 @@ const ResetButton = styled(Button).attrs({ type: "reset" })`
 `;
 
 type Props = {
-    children:React.ReactNode,
+  children: React.ReactNode;
 };
 
-
-export default function FormResetButton({children}:Props) {
-    return (
-        <ResetButton>
-            {children}
-        </ResetButton>
-    )
+export default function FormResetButton({ children }: Props) {
+  return <ResetButton>{children}</ResetButton>;
 }
-

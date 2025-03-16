@@ -1,8 +1,7 @@
-import { AnnualProfitDocument } from "@/Types/AnnualProfit";
+import { AnnualProfitDocument } from "@/_Types/AnnualProfit";
 import { Model, Schema, model, models } from "mongoose";
 
-
-type AnnualProfitModel = Model<AnnualProfitDocument>
+type AnnualProfitModel = Model<AnnualProfitDocument>;
 const annualProfitSchema = new Schema<AnnualProfitDocument>({
   store: {
     type: Schema.Types.ObjectId,
@@ -22,7 +21,12 @@ const annualProfitSchema = new Schema<AnnualProfitDocument>({
 
 annualProfitSchema.index({ store: 1, year: 1 });
 
-const AnnualProfit = models?.AnnualProfit || model<AnnualProfitDocument, AnnualProfitModel>("AnnualProfit", annualProfitSchema);
+const AnnualProfit =
+  models?.AnnualProfit ||
+  model<AnnualProfitDocument, AnnualProfitModel>(
+    "AnnualProfit",
+    annualProfitSchema
+  );
 
 export default AnnualProfit;
 

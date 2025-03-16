@@ -1,4 +1,4 @@
-import { StoreStateDocument } from "@/Types/StoreStat";
+import { StoreStateDocument } from "@/_Types/StoreStat";
 import { Model, Schema, model, models } from "mongoose";
 
 type StoreStateModel = Model<StoreStateDocument>;
@@ -55,7 +55,9 @@ const storeStatSchema = new Schema<StoreStateDocument>({
 
 storeStatSchema.index({ store: 1, date: 1 });
 
-const StoreStat = models?.StoreState || model<StoreStateDocument, StoreStateModel>("StoreStat", storeStatSchema);
+const StoreStat =
+  models?.StoreState ||
+  model<StoreStateDocument, StoreStateModel>("StoreStat", storeStatSchema);
 
 export default StoreStat;
 

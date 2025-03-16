@@ -1,8 +1,8 @@
 import { Model, Schema, model, models } from "mongoose";
-import { WishlistDocument } from "@/Types/Wishlist";
+import { WishlistDocument } from "@/_Types/Wishlist";
 
 // a feature only accessible by the Plus subscribers
-type WishListModel = Model<WishlistDocument>
+type WishListModel = Model<WishlistDocument>;
 const wishlistSchema = new Schema<WishlistDocument>(
   {
     user: {
@@ -25,6 +25,8 @@ const wishlistSchema = new Schema<WishlistDocument>(
   }
 );
 
-const Wishlist = models?.Wishlist || model<WishlistDocument, WishListModel>("Wishlist", wishlistSchema);
+const Wishlist =
+  models?.Wishlist ||
+  model<WishlistDocument, WishListModel>("Wishlist", wishlistSchema);
 
 export default Wishlist;
