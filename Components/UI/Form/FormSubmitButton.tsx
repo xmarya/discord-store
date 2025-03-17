@@ -12,18 +12,14 @@ const SubmitButton = styled(Button).attrs({ type: "submit" })`
 type Props = {
   children: React.ReactNode;
   condition: boolean;
-};
+} & React.ButtonHTMLAttributes<HTMLButtonElement>;
 
-export default function FormSubmitButton({ children, condition }: Props) {
+export default function FormSubmitButton({ children, condition, ...props }: Props) {
   const { pending, action, data, method } = useFormStatus();
   const isDisabled = pending || condition;
   console.log("isDisabled", isDisabled);
   return (
-    <SubmitButton aria-disabled={isDisabled} disabled={isDisabled} onClick={() => (console.log("clicked",
-      "action", action,
-      "data", data,
-      "method", method
-    ))}>
+    <SubmitButton aria-disabled={isDisabled} disabled={isDisabled} {...props}>
       {children}
     </SubmitButton>
   );

@@ -50,8 +50,6 @@ function FormContextProvider({children, formAction}:Props) {
 
         //STEP: 3) isFormValid = true,
         setIsFormValid(formHasValid);
-
-
     }
 
     // the job of this functions is: 
@@ -73,8 +71,8 @@ function FormContextProvider({children, formAction}:Props) {
         <FormContext value={{register, isFormValid}}>
             <Form action={action}>
                 {children}
-                <FormSubmitButton condition={!isFormValid}>{isPending ? "جاري الحفظ..." : "حفظ"}</FormSubmitButton>
-                <FormResetButton aria-disabled={isPending}>مسح</FormResetButton>
+                <FormSubmitButton onClick={() => setIsFormValid(false)} condition={!isFormValid}>{isPending ? "جاري الحفظ..." : "حفظ"}</FormSubmitButton>
+                <FormResetButton onClick={() => setIsFormValid(false)} aria-disabled={isPending}>مسح</FormResetButton>
             </Form>
         </FormContext>
     )

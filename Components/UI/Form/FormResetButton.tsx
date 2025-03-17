@@ -8,8 +8,8 @@ const ResetButton = styled(Button).attrs({ type: "reset" })`
 
 type Props = {
   children: React.ReactNode;
-};
+} & React.ButtonHTMLAttributes<HTMLButtonElement>;
 
-export default function FormResetButton({ children }: Props) {
-  return <ResetButton>{children}</ResetButton>;
+export default function FormResetButton({ children, ...props }: Props) {
+  return <ResetButton {...props}>{children}</ResetButton>;
 }
