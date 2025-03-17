@@ -1,12 +1,14 @@
+import { StatusCode } from "./FormContext";
+
 export type FormContextEvent = React.FocusEvent<HTMLInputElement> | KeyboardEvent;
 
 export type FormContextInput  = {
   name:string,
   // validate: ValidateEventOptions,
 } & React.InputHTMLAttributes<HTMLInputElement> &(
-  {eventType: "onBlur", validate: (event:React.FocusEvent<HTMLInputElement>) => void | Promise<void>}
+  {eventType: "onBlur", validate: (event:React.FocusEvent<HTMLInputElement>) => StatusCode | Promise<StatusCode>}
   |
-  {eventType: "onKeyDown", validate: (event:React.KeyboardEvent<HTMLInputElement>) => void | Promise<void>}
+  {eventType: "onKeyDown", validate: (event:React.KeyboardEvent<HTMLInputElement>) => StatusCode | Promise<StatusCode>}
 );
 
 

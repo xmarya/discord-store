@@ -4,6 +4,7 @@ import { CategoryBasic } from "@/_Types/Category"
 import { FormBlock } from "../UI/Form/FromBlock"
 import { Label } from "../UI/Form/Label"
 import TagInput from "../UI/Form/TagInput"
+import { StatusCode } from "@/_Types/FormContext"
 
 type Props = {
     categories:Array<CategoryBasic> | [],
@@ -12,10 +13,10 @@ type Props = {
 export default function StoreCategoryInput({categories}:Props) {
     const planQuota = 4; //TODO: correctly get this depending on the user plan. I highly recommend to store the plan inside the session
 
-    function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+    function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>):StatusCode {
         const userInput = event.currentTarget;
         const tagText = userInput.value;
-        if (event.key !== "Enter" || tagText === "") return; //FIX: this should still prevent the submission, but throwing an error will block the submission on other valid inputs
+        if (event.key !== "Enter" || tagText === "") return "noChange"; 
     
         event.preventDefault(); // prevent the default behaviour + adding a new line.
         if ((categories?.length ?? 0) <= planQuota && tagText.trim() !== "") {
@@ -30,6 +31,7 @@ export default function StoreCategoryInput({categories}:Props) {
             userInput.value = "";
           }
         }
+        return "valid";
       }
 
       async function handleAddTag(newTag: string) {

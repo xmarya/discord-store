@@ -3,6 +3,7 @@ import { StoreBasic } from "@/_Types/Store";
 import { FormBlock } from "../UI/Form/FromBlock";
 import Input from "../UI/Form/Input";
 import { Label } from "../UI/Form/Label";
+import { StatusCode } from "@/_Types/FormContext";
 
 type namesObject = Pick<StoreBasic, "_id" | "storeName">;
 type Props = {
@@ -13,7 +14,7 @@ type Props = {
 
 export default function StoreNameInput({storeName, storeId, availableNames}:Props) {
 
-    function checkAvailability(event: React.FocusEvent<HTMLInputElement>) {
+    function checkAvailability(event: React.FocusEvent<HTMLInputElement>):StatusCode {
         // Reset the state to disable the button:
     
         // Guard clause 1) is it a newly created store with no name ?
@@ -30,12 +31,14 @@ export default function StoreNameInput({storeName, storeId, availableNames}:Prop
         }
     
         // Guard clause 3) did the user changed the current name to a new one ?
-        if (userInput === storeName) return; //FIX: this should still prevent the submission, but throwing an error will block the submission on other valid inputs
+        if (userInput === storeName) return "noChange";
     
         // Guard clause 4) is the new name exist in the db names && is it associated with a different store if ?
         const isTaken = availableNames.some((obj) => obj.storeName === userInput && obj._id !== storeId);
     
         if(isTaken) throw new Error("اسم المتجر مستخدم بالفعل");
+
+        return "valid";
       }
 
     return (
@@ -43,6 +46,7 @@ export default function StoreNameInput({storeName, storeId, availableNames}:Prop
             <Label htmlFor="storeName">اسم المتجر:</Label>
             <Input name="storeName" eventType="onBlur" type="text" placeholder="اسم متجرك" defaultValue={storeName} 
             validate={checkAvailability} required/>
+            {/* TODO: prevent any special character in the name */}
         </FormBlock>
     )
 }
