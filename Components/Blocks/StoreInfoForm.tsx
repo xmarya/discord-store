@@ -21,7 +21,7 @@ export default function StoreInfoForm({ store, availableNames, formAction }: Pro
         {
           storeId &&
           <>
-          <StoreCategoryInput categories={categories}/>
+          <StoreCategoryInput categories={categories} storeId={storeId}/>
           <input type="hidden" defaultValue={storeId} name="storeId" />
           </>
         }

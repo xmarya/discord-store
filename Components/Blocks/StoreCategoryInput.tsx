@@ -5,12 +5,16 @@ import { FormBlock } from "../UI/Form/FromBlock"
 import { Label } from "../UI/Form/Label"
 import TagInput from "../UI/Form/TagInput"
 import { StatusCode } from "@/_Types/FormContext"
+import { useState } from "react"
+import Input from "../UI/Form/Input"
 
 type Props = {
-    categories:Array<CategoryBasic> | [],
+    categories:Array<CategoryBasic> | undefined,
+    storeId:string
 }
 
-export default function StoreCategoryInput({categories}:Props) {
+export default function StoreCategoryInput({categories, storeId}:Props) {
+    const [tagsArray, setTagsArray] = useState(categories);
     const planQuota = 4; //TODO: correctly get this depending on the user plan. I highly recommend to store the plan inside the session
 
     function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>):StatusCode {
@@ -18,10 +22,10 @@ export default function StoreCategoryInput({categories}:Props) {
         const tagText = userInput.value;
         if (event.key !== "Enter" || tagText === "") return "noChange"; 
     
-        event.preventDefault(); // prevent the default behaviour + adding a new line.
-        if ((categories?.length ?? 0) <= planQuota && tagText.trim() !== "") {
+        event.preventDefault(); // prevent the default behaviour or adding a new line.
+        if ((tagsArray?.length ?? 0) <= planQuota && tagText.trim() !== "") {
           // the same as => const value = getTagValue(tag) => value === newTag
-          if (categories?.some((t) => t.name === tagText)) {
+          if (tagsArray?.some((t) => t.name === tagText)) {
             userInput.value = "";
             throw new Error("لا يمكن اضافة نفس الفئة مجددًا");
           } 
@@ -35,17 +39,12 @@ export default function StoreCategoryInput({categories}:Props) {
       }
 
       async function handleAddTag(newTag: string) {
-        // logic of adding the new category to the db.
-        // const newCat: T = { name: newTag, colour: "#d1d5db" } as T; // I had to use cast to tell TS it's safe to consider this obj as Category.
-        // // optimisticAction(newCat);
-        // // const newTags:Array<T> = [...(tags?.length ? tags : []), newCat];
-        // setTagState((currentState) => [
-        //   ...(currentState?.length ? currentState : []),
-        //   newCat,
-        // ]);
-    
-        // tags?.push(newCat);
-        // setStoreData({ categories: tags });
+
+        const newCat = { name: newTag, colour: "#d1d5db", store:storeId };
+        const newTags = [...(tagsArray?.length ? tagsArray : []), newCat];
+        console.log("newTags", newTags);
+
+        setTagsArray(newTags); /* SOLILOQUY: how to get this to be part of formData? they are not inside the input itself to be sent within the form! */
       }
     
       function handleDeleteTag(tag: string) {}
@@ -53,14 +52,17 @@ export default function StoreCategoryInput({categories}:Props) {
     return (
         <FormBlock>
             <Label>فئات المنتجات:</Label>
-            <TagInput name="categories" eventType="onKeyDown" validate={handleKeyDown} tags={categories} type="text" placeholder={
-              (categories?.length ?? 0) >= planQuota
-                ? "بلغت الحد المسموح به"
-                : "ادخل فئة جديدة"
-            }
-            disabled={(categories?.length ?? 0) >= planQuota}/>
+            <TagInput tags={tagsArray} getTagValue={cat => cat.name}>
+                <Input type="text" name="categories" eventType="onKeyDown" validate={handleKeyDown}
+                placeholder={
+                  (tagsArray?.length ?? 0) >= planQuota
+                    ? "بلغت الحد المسموح به"
+                    : "ادخل فئة جديدة"
+                }
+                disabled={(tagsArray?.length ?? 0) >= planQuota}/>
+              </TagInput>
             <span>
-              {categories?.length ?? 0} / {planQuota}
+              {tagsArray?.length ?? 0} / {planQuota}
             </span>
         </FormBlock>
     )
