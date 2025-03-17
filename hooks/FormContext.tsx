@@ -24,6 +24,9 @@ function FormContextProvider({children, formAction}:Props) {
     const [isFormValid, setIsFormValid] = useState(false);
     const [formState, action, isPending] = useActionState(formAction, null);
 
+    function checkStatus(code:StatusCode, inputs:Record<string, StatusCode>) {
+        return Object.values(inputs).some((status) => status === code);
+    }
     
     function checkValidity() {
         /* OLD CODE (kept for reference): 
@@ -33,22 +36,20 @@ function FormContextProvider({children, formAction}:Props) {
         */
 
        //STEP: 1) check if there is an error first. if there, set the form and return early.
-        const hasError = Object.values(inputsValidStatus.current).some((code) => code === "error");
-        console.log("hasError", hasError);
-        if(hasError) {
+        const formHasError = checkStatus("error", inputsValidStatus.current);
+
+        if(formHasError) {
             setIsFormValid(false); // make sure the form is RESET to be false. 
             // in case I just returned without setIsFormValid(false); 
             // the previous state which it maybe true will allow submission to the back-end.
             return; // early return.
         }
-        console.log("after early return");
 
         //STEP: 2) since no error, check if one of them is valid or they all unchanged:
-        const hasValid = Object.values(inputsValidStatus.current).some((code) => code === "valid");
-        console.log("hasValid", hasValid);
+        const formHasValid = checkStatus("valid", inputsValidStatus.current)
 
         //STEP: 3) isFormValid = true,
-        setIsFormValid(hasValid);
+        setIsFormValid(formHasValid);
 
 
     }
