@@ -1,15 +1,31 @@
 import { StatusCode } from "./FormContext";
 
-export type FormContextEvent = React.FocusEvent<HTMLInputElement> | KeyboardEvent;
+// STEP 1) Create a mapping type with keys hold a specific type.
+export type EventTypesMap = {
+  onBlur: React.FocusEvent<HTMLInputElement>,
+  onKeyDown: React.KeyboardEvent<HTMLInputElement>
+}
 
-export type FormContextInput  = {
+// STEP 2) use keyof to MAP to extract the keys into a separate type.
+export type EventTypes = keyof EventTypesMap;
+
+// STEP 3) use them as a Generic to dynamically resolve the correct type based on the key.
+export type FormContextInput <T extends EventTypes> = {
   name:string,
-  // validate: ValidateEventOptions,
-} & React.InputHTMLAttributes<HTMLInputElement> &(
-  {eventType: "onBlur", validate: (event:React.FocusEvent<HTMLInputElement>) => StatusCode | Promise<StatusCode>}
-  |
-  {eventType: "onKeyDown", validate: (event:React.KeyboardEvent<HTMLInputElement>) => StatusCode | Promise<StatusCode>}
-);
+  eventType: T,
+  validate: (event:EventTypesMap[T]) => StatusCode | Promise<StatusCode>
+
+} & React.InputHTMLAttributes<HTMLInputElement> 
+
+/* OLD CODE (kept for reference): 
+    export type FormContextInput  = {
+      name:string,
+    } & React.InputHTMLAttributes<HTMLInputElement> &(
+      {eventType: "onBlur", validate: (event:React.FocusEvent<HTMLInputElement>) => StatusCode | Promise<StatusCode>}
+      |
+      {eventType: "onKeyDown", validate: (event:React.KeyboardEvent<HTMLInputElement>) => StatusCode | Promise<StatusCode>}
+    );
+*/
 
 
 /*

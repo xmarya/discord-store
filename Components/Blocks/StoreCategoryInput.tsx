@@ -50,20 +50,20 @@ export default function StoreCategoryInput({categories, storeId}:Props) {
       function handleDeleteTag(tag: string) {}
 
     return (
-        <FormBlock>
+        <FormBlock> {/* flex column */}
             <Label>فئات المنتجات:</Label>
-            <TagInput tags={tagsArray} getTagValue={cat => cat.name}>
-                <Input type="text" name="categories" eventType="onKeyDown" validate={handleKeyDown}
-                placeholder={
-                  (tagsArray?.length ?? 0) >= planQuota
-                    ? "بلغت الحد المسموح به"
-                    : "ادخل فئة جديدة"
-                }
-                disabled={(tagsArray?.length ?? 0) >= planQuota}/>
-              </TagInput>
-            <span>
-              {tagsArray?.length ?? 0} / {planQuota}
-            </span>
+            <TagInput type="text" name="categories" eventType="onKeyDown" validate={handleKeyDown} 
+            tags={tagsArray} getTagValue={cat => cat.name}
+            placeholder={
+              (tagsArray?.length ?? 0) >= planQuota
+                ? "بلغت الحد المسموح به"
+                : "ادخل فئة جديدة"
+            }
+            disabled={(tagsArray?.length ?? 0) >= planQuota}>
+              <span>
+                {tagsArray?.length ?? 0} / {planQuota}
+              </span>
+            </TagInput>
         </FormBlock>
     )
 }

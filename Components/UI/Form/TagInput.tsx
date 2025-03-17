@@ -1,9 +1,7 @@
-import { FormContextInput } from "@/_Types/FormContextInput";
+import { EventTypes, FormContextInput } from "@/_Types/FormContextInput";
+import { FaEllipsisVertical } from "react-icons/fa6";
 import styled from "styled-components";
 import Input from "./Input";
-import { FormError } from "./FormError";
-import { useState } from "react";
-import { FaEllipsisVertical } from "react-icons/fa6";
 
 const TagInputWrapper = styled.div`
   display: flex;
@@ -19,30 +17,31 @@ const TagsList = styled.ul`
 `;
 
 type Tag = Record<string, any>;
-type Props = {
-  tags: Array<Tag>,
-  getTagValue?: (tag:Tag) => string,
-} & FormContextInput
 
-export default function TagInput({name, validate, tags, getTagValue, ...props}:Props) {
-  const [tagState, setTagState] = useState<Array<Tag> | []>(tags);
-  const [error, setError] = useState("");
+type Props <T extends EventTypes> = {
+  tags: Array<Tag> | undefined,
+  getTagValue: (tag:Tag) => string,
+  children?:React.ReactNode
+} & FormContextInput<T>;
+
+export default function TagInput<T extends EventTypes>({name, validate, eventType, tags, getTagValue, children}:Props<T>) {
+
   return (
     <>
       <TagsList>
-        {tagState?.map((t, index) => (
+        {tags?.map((t, index) => (
           <li key={index}>
-            <span>{getTagValue?.(t)}</span>
+            <span>{getTagValue(t)}</span>
             <button type="button">
               <FaEllipsisVertical />
             </button>
           </li>
         ))}
       </TagsList>
-      <TagInputWrapper>
-      <Input name={name} validate={validate} {...props}/>
-      <FormError $hasError={!!error}>{error}</FormError>
-    </TagInputWrapper>
+      <TagInputWrapper> {/*flex row */}
+        <Input name={name} eventType={eventType} validate={validate}/>
+        {children}
+      </TagInputWrapper>
     </>
   )
 }
