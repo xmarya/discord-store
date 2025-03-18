@@ -6,7 +6,7 @@ import { Label } from "../UI/Form/Label"
 import TagInput from "../UI/Form/TagInput"
 import { StatusCode } from "@/_Types/FormContext"
 import { useState } from "react"
-import Input from "../UI/Form/Input"
+import TagsList from "../UI/TagsList"
 
 type Props = {
     categories:Array<CategoryBasic> | undefined,
@@ -52,8 +52,8 @@ export default function StoreCategoryInput({categories, storeId}:Props) {
     return (
         <FormBlock> {/* flex column */}
             <Label>فئات المنتجات:</Label>
-            <TagInput type="text" name="categories" eventType="onKeyDown" validate={handleKeyDown} 
-            tags={tagsArray} getTagValue={cat => cat.name}
+            <TagsList tags={tagsArray} getTagValue={cat => cat.name}/>
+            <TagInput type="text" name="tagsInput" eventType="onKeyDown" validate={handleKeyDown} 
             placeholder={
               (tagsArray?.length ?? 0) >= planQuota
                 ? "بلغت الحد المسموح به"
@@ -64,6 +64,7 @@ export default function StoreCategoryInput({categories, storeId}:Props) {
                 {tagsArray?.length ?? 0} / {planQuota}
               </span>
             </TagInput>
+            <input type="hidden" name="categories" defaultValue={"categories"}/>
         </FormBlock>
     )
 }
