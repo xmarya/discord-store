@@ -29,11 +29,16 @@ export default function StoreNameInput({storeName, storeId, availableNames}:Prop
         if (!userInput || userInput.trim() === "") {
           throw new Error("لابد من إضافة اسم للمتجر");
         }
-    
+
         // Guard clause 3) did the user changed the current name to a new one ?
         if (userInput === storeName) return "noChange";
+        
+        //TODO: condition to 
+        // Guard clause 4) is the new name has special characters or all-are-numbers => ^(?!\d+$)[\p{L}\p{N} ]+$ ?
+        const regex = new RegExp("^(?!\d+$)[\p{L}\p{N} ]+$");
+        if(regex.test(userInput)) throw new Error("يجب أن يحتوي الاسم على أحرف وأرقام فقط");
     
-        // Guard clause 4) is the new name exist in the db names && is it associated with a different store if ?
+        // Guard clause 5) is the new name exist in the db names && is it associated with a different store if ?
         const isTaken = availableNames.some((obj) => obj.storeName === userInput && obj._id !== storeId);
     
         if(isTaken) throw new Error("اسم المتجر مستخدم بالفعل");
