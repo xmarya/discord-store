@@ -1,6 +1,7 @@
 import "@/models/storeModel"; // ✅ Make sure Store is registered before User
-import { UserDocument } from "@/_Types/User";
+import { UserDocument, UserMethods } from "@/_Types/User";
 import { Model, Query, Schema, model, models } from "mongoose";
+import bcrypt from "bcryptjs";
 
 // UserModel is only used when creating the Mongoose model at the last of the file (after creating the Schema).
 type UserModel = Model<UserDocument>;
@@ -23,9 +24,8 @@ const userSchema = new Schema<UserDocument>(
       password: {
         type: String,
         minLength: [8, "your password must be at least 8 characters"],
-        select: false,
       },
-      passwordConfirm: String, // NOTE: zod will be use to validate this filed
+      // passwordConfirm: String, // NOTE: zod will be use to validate this filed
       // on the front-end + the field itself won't be saved in the db.
       // it's only use inside the pre hook to check the password
       passwordResetToken: String,
@@ -197,17 +197,47 @@ userSchema.pre(/^find/, function (this: Query<any, any>, next) {
   next();
 });
 
-userSchema.pre("save", function (next) {
-  // mongoose documents require an explicit cast when dealing with nested objects (credential subdocument) inside hooks.
-  // Explicitly Casts `this` as UserDocument → This tells TypeScript that this has the credentials and discord fields.
-  const user = this as UserDocument;
-  if (user.signMethod !== "credentials" && !user.credentials) return next();
+/* OLD CODE (kept for reference): 
+    userSchema.pre("save", function (next) {
+      // mongoose documents require an explicit cast when dealing with nested objects (credential subdocument) inside hooks.
+      // Explicitly Casts `this` as UserDocument → This tells TypeScript that this has the credentials and discord fields.
+      const user = this as UserDocument;
+      if (user.signMethod !== "credentials" && !user.credentials) return next();
+      
+      if (user?.credentials?.password !== user?.credentials?.passwordConfirm)
+      return next(new Error("Passwords do not match"));
+      
+      next();
+    });
+*/
 
-  if (user?.credentials?.password !== user?.credentials?.passwordConfirm)
-    return next(new Error("Passwords do not match"));
+// this pre hook is for encrypting the pass before saving it
+userSchema.pre("save", async function(next) {
+  // STEP 1) check if the user isNew and the signMethod is credentials: (the condition this.credentials is for getting rid ot possibly undefined error)
+  if(this.isNew && this.signMethod === "credentials" && this.credentials){
+    this.credentials.password = await bcrypt.hash(this.credentials?.password, 13);
+    next();
+  }
+});
 
+// this pre hook is to set the passwordChangedAt:
+userSchema.pre("save", async function(next) {
+  if(this.credentials && this.isModified(this.credentials.password)) {
+    this.credentials.passwordChangedAt = new Date();
+  }
   next();
 });
+
+userSchema.methods.comparePasswords = async function(providedPassword:string, userPassword:string) {
+     /* 
+    instanced methods are available on the document, 
+    so, this keyword points to the current document. then why we're not using this.password?
+    actually in this case, since we have set the password to select false, 
+    this.password will not be available. So we will pass it from the controllerAuth since we've ot it there.
+  */
+  return await bcrypt.compare(providedPassword, userPassword);
+}
+
 // model(Document, Model)
 const User = models?.User || model<UserDocument, UserModel>("User", userSchema);
 
