@@ -6,7 +6,7 @@ import Store from "@/models/storeModel";
 import User from "@/models/userModel";
 import { revalidatePath } from "next/cache";
 
-export const createStore = withDBConnection(async (formData: FormData) => {
+export const createStore = withDBConnection(async (prevState:any, formData: FormData) => {
   // the newStore probably if got from the formData, the userId from the session
   const session = await auth();
   const userId = session?.user.id;
@@ -27,7 +27,7 @@ export const createStore = withDBConnection(async (formData: FormData) => {
   revalidatePath("/dashboard/myStore");
 });
 
-export const updateStore = withDBConnection(async (formData: FormData) => {
+export const updateStore = withDBConnection(async (prevState:any, formData: FormData) => {
   const {storeId, storeName, categories} = Object.fromEntries(formData);
 
   // STEP 1) pass in ONLY the editable data:

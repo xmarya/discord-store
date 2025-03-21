@@ -1,17 +1,16 @@
 "use client"
 
 import { credentialsSignup } from "@/_actions/auth/credentials"
-import { useActionState, useEffect } from "react"
+import { useActionState } from "react"
+import { FormError } from "../UI/Form/FormError"
 import FormSubmitButton from "../UI/Form/FormSubmitButton"
 import { FormBlock } from "../UI/Form/FromBlock"
 import { Label } from "../UI/Form/Label"
-import { FormError } from "../UI/Form/FormError"
 
 
 export default function SignupForm() {
     const [formState, action, isPending] = useActionState(credentialsSignup, null);
 
-    useEffect(() => {console.log("formState",formState, !!formState?.errors);}, [formState]);
     return (
         <form action={action}>   
             <FormBlock>

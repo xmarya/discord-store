@@ -51,4 +51,8 @@ export interface UserOptionals {
   myStore?: Types.ObjectId;
 }
 
-export type UserDocument = UserBasic & UserOptionals & UserPlan;
+export interface UserMethods {
+  comparePasswords: (providedPassword:string, userPassword:string) => Promise<boolean>
+}
+
+export type UserDocument = UserBasic & UserOptionals & UserPlan & UserMethods;
