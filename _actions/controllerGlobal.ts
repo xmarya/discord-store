@@ -35,12 +35,10 @@ export const getMyStore = withDBConnection(async (userId: string) => {
   return JSON.parse(JSON.stringify(userStore));
 });
 
-export const getField = withDBConnection(async (Model: string, field: string): Promise<Array<string>> => {
-    const doc = await mongoose.model(Model).find().select(field);
+export const getField = withDBConnection(async (Model: string, field: string): Promise<Array<Record<string, any>>> => {
 
-    // const fieldsArray = getFieldValuesArray(field, doc);
-    // console.log(fieldsArray);
-    return JSON.parse(JSON.stringify(doc));
+    const docs = await mongoose.model(Model).find().select(field);
+    return JSON.parse(JSON.stringify(docs));
   }
 );
 
