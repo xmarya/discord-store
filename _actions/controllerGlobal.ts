@@ -2,7 +2,8 @@
 
 import User from "@/models/userModel";
 import { withDBConnection } from "@/_utils/controllerWrapper";
-import mongoose from "mongoose";
+import mongoose, { Document } from "mongoose";
+import { UserDocument } from "@/_Types/User";
 
 export const getAll = withDBConnection(
   async (Model: string, filter?: {}) => {}
@@ -12,11 +13,18 @@ export const getAll = withDBConnection(
 //      as I can only search for the users using their email that comes from the discord auth
 //      If I used a controller called getOne() for all of the models then I would have had to write an if-else to
 //     determine whether to use find({email}) or findById().
-export const getUser = withDBConnection(async (email: string) => {
-  console.log("getUser 1", email);
-  const user = await User.find({ email }).select("userType");
+export const getUser = withDBConnection(async (email: string, select?:string):Promise<UserDocument | null> => {
 
-  return JSON.parse(JSON.stringify(user)); // NOTE: to convert the _id:new ObjectId('67c43f535c8da8d1edff3aa1') to be a string
+  const user = await User.findOne({ email }).select(`userType ${select}`);
+  /* OLD CODE (kept for reference): 
+    // return JSON.parse(JSON.stringify(user)); // NOTE: to convert the _id:new ObjectId('67c43f535c8da8d1edff3aa1') to be a string
+     converting the Mongoose document to a plain object with JSON.parse(JSON.stringify(user)), 
+     strips off the document’s prototype (and hence its instance methods). 
+     This is why calling user.comparePasswords results in “not a function” – the plain object no longer has 
+     the method defined on the schema.
+  */
+  
+  console.log("JUST BEFORE return user");  return user; 
 });
 
 export const getMyStore = withDBConnection(async (userId: string) => {
@@ -27,8 +35,7 @@ export const getMyStore = withDBConnection(async (userId: string) => {
   return JSON.parse(JSON.stringify(userStore));
 });
 
-export const getField = withDBConnection(
-  async (Model: string, field: string): Promise<Array<string>> => {
+export const getField = withDBConnection(async (Model: string, field: string): Promise<Array<string>> => {
     const doc = await mongoose.model(Model).find().select(field);
 
     // const fieldsArray = getFieldValuesArray(field, doc);
@@ -37,7 +44,7 @@ export const getField = withDBConnection(
   }
 );
 
-export const getOne = withDBConnection(async (Model: string, id: string) => {
+export const getOneById = withDBConnection(async (Model: string, id: string):Promise<Document | null> => {
   const doc = await mongoose.model(Model).findById(id);
   return doc;
 });

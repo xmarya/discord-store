@@ -6,7 +6,7 @@ and specify custom authentication logic, adapters, etc.
 import NextAuth, { CredentialsSignin, type DefaultSession } from "next-auth";
 import Discord from "next-auth/providers/discord";
 import Credentials from "next-auth/providers/credentials"
-import { getUser, getUserById } from "@/_actions/controllerGlobal";
+import { getOneById, getUser, getUserById } from "@/_actions/controllerGlobal";
 import { createDiscordUser } from "@/_actions/mutation/user";
 
 // By default, the `id` property does not exist on `session` of async session({ session, user})
@@ -77,7 +77,7 @@ const authConfig = NextAuth({
         another important thing about this callback is that is MUST always return the token object.
        */
       if(!token.sub) return token;
-      const isExist = await getUserById(token.sub);
+      const isExist = await getOneById("User",token.sub);
         console.log("auth JWT isExist", !!isExist);
       if(!isExist) return token
 
