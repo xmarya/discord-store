@@ -3,10 +3,11 @@ NOTE: This is where you can control the behaviour of the library
 and specify custom authentication logic, adapters, etc.
 */
 
-import NextAuth, { type DefaultSession } from "next-auth";
+import NextAuth, { CredentialsSignin, type DefaultSession } from "next-auth";
 import Discord from "next-auth/providers/discord";
-import { getUser } from "@/_actions/controllerGlobal";
-import { createUser } from "@/_actions/mutation/user";
+import Credentials from "next-auth/providers/credentials"
+import { getUser, getUserById } from "@/_actions/controllerGlobal";
+import { createDiscordUser } from "@/_actions/mutation/user";
 
 // By default, the `id` property does not exist on `session` of async session({ session, user})
 // See the [TypeScript](https://authjs.dev/getting-started/typescript) on how to add it.
@@ -20,18 +21,35 @@ declare module "next-auth" {
       id: string; // `session.user.id` is now a valid property, and will be type-checked
       // in places like `useSession().data.user` or `auth().user`
       userType: string;
+      plan:string,
+      isOauth:boolean,
       /**
        * By default, TypeScript merges new interface properties and overwrites existing ones.
        * In this case, the default session user properties will be overwritten,
        * with the new ones defined above. To keep the default session user properties,
        * you need to add them back into the newly declared interface.
        */
+
+      // TODO: add the plan name
     } & DefaultSession["user"];
   }
 }
 
+
 const authConfig = NextAuth({
-  providers: [Discord],
+  providers: [Discord, 
+    Credentials({
+      name: "Credentials",
+      async authorize(credentials, request) {
+        // console.log("Credentials authorize", credentials);
+        const {email} = credentials;
+        if(typeof email !== "string") return null;
+        const user = await getUser(email);
+        // console.log("Credentials authorize2", user);
+        
+       return {id: user?._id, userType: user?.userType, plan: user?.planName};
+      }
+    })],
   session: {
     strategy: "jwt",
   },
@@ -43,46 +61,88 @@ const authConfig = NextAuth({
       // authorized() callback check whether the user is authorised or not
       // before give the access to the protected routes by returning false or true
     },
+    async jwt({token, user, account, profile}) {
+      console.log("JWT CALLBACK 🔐");
+      /* This callback persists the data (such as Access Token). any kind of data
+        that is wanted to be stored in the browser should be assigned to the token argument.
+        then the session callback passes the data through to the browser.
+        JWT is called whenever:
+          A- a JSON Web Token is created (i.e. at sign in) 
+          B- or updated (i.e whenever a session is accessed in the client). 
+        The returned value will be encrypted, and it is stored in a cookie.
+        token expiry time is extended whenever a session is active.
+        NOTE: The arguments user, account, profile and isNewUser are 
+        only passed the first time this callback is called on a new session, 
+        after the user signs in. In subsequent calls, only token will be available.
+        another important thing about this callback is that is MUST always return the token object.
+       */
+      if(!token.sub) return token;
+      const isExist = await getUserById(token.sub);
+        console.log("auth JWT isExist", !!isExist);
+      if(!isExist) return token
 
-    async signIn({ user }) {
-      console.log("SIGNIN CALLBACK 🔎");
+      // check if the user' signMethod:
+      console.log("isExist.signMethod",isExist.signMethod);
+      // adding a isOAuth property to the token for later in signIn callback:
+      token.isOAuth = isExist.signMethod === "discord" ? true : false;
+      token.username = isExist.username
+      token.plan = isExist.planName;
+      token.email = isExist.email;
+      token.image = isExist.image;
+
+      return token;
+
+    },
+    async session({ session, token, user }) {
+      console.log("SESSION CALLBACK ⏳");
+      const currentUser = await getUser(session?.user.email);
+      // console.log("currentUser🔴", currentUser);
+
+      if(!currentUser?._id) throw new Error("no user found, the session couldn't be created");
+      // console.log("⏳⏳⏳",session);
+      // 1) adding the role and the id to the session info:
+      return {
+        ...session,
+        user :{
+          id: currentUser._id,
+          userType: currentUser.userType,
+          plan: token.plan,
+          isOauth:token.isOauth
+        }
+      };
+    },
+    async signIn({ user, credentials, account }) {
+      // console.log("SIGNIN CALLBACK 🔎user", !!user);
+      // console.log("SIGNIN CALLBACK 🔎credentials", credentials);
+      // console.log("SIGNIN CALLBACK account", account);
+      
       try {
-        if (typeof user.email !== "string") return false; // to solve => Argument of type 'string | null | undefined' is not assignable to parameter of type 'string'.
+        if (typeof user.email !== "string" && !credentials?.email) return false; // to solve => Argument of type 'string | null | undefined' is not assignable to parameter of type 'string'.
         // 1) look up for the sam email in the db
-        const isExist = await getUser(user.email);
-        // console.log("isExist", isExist, isExist.length === 0);
+        const email = (user.email ?? credentials?.email) as string
+        const isExist = await getUser(email);
+        // console.log("isExist", isExist);
         //TODO: if not exist => forward the user to the plan page to select one and pay for it then create a new user
 
         /* OLD CODE (kept for reference): 
-          if (!isExist) await createNewUser(user);
-          the statement above was not work since the getUser() return an empty array [].
-          in javascript [] and {} are falsy but non-nullish value
-          if course !isExist prints false bu the if condition behaves differently:
-          if (!isExist) is effectively if (![]), which does not trigger because [] is a truthy value.
-          the syntax !isExist ONLY WORKS with undefined and null
-        */
+            if (!isExist) await createNewUser(user);
+            the statement above was not work since the getUser() return an empty array [].
+            in javascript [] and {} are falsy but non-nullish value
+            if course !isExist prints false bu the if condition behaves differently:
+            if (!isExist) is effectively if (![]), which does not trigger because [] is a truthy value.
+            the syntax !isExist ONLY WORKS with undefined and null
 
+            NOTE: since it genONEUser I changed the query type from find that returns an array to findOne that returns a single object
+        */
         // 2) if not exist then create a new user
-        if (isExist.length === 0) await createUser(user);
+        if (!isExist && account?.provider === "discord") await createDiscordUser(user);
         return true;
+
       } catch (error) {
         return false;
         // NOTE: this md only returns boolean, that'w why I can't throw any error here,
         // handle any error where this md was called (inside the authActions.ts).
       }
-    },
-    async session({ session }) {
-      console.log("SESSION CALLBACK ⏳");
-      const currentUser = await getUser(session?.user.email);
-      // console.log("currentUser🔴", currentUser, typeof currentUser);
-
-      // 1) adding the role and the id to the session info:
-      session.user.id = currentUser[0]._id;
-      session.user.userType = currentUser[0].userType;
-      // console.log("⏳⏳⏳",session);
-
-      // console.log("the working session FINALLY", session);
-      return session;
     },
   },
 
