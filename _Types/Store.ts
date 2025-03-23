@@ -13,6 +13,7 @@ export interface StoreBasic {
 }
 
 export interface StoreOptionals {
+    logo?:string,
     storeAssistants?:Array<Types.ObjectId>
     categories?:Array<CategoryDocument>,
     colourTheme?:Types.ObjectId, // reference to one of the themes that defined inside ColourTheme Model, the user is going to select one theme

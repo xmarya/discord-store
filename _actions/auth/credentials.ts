@@ -3,17 +3,15 @@
 import { signIn, signOut } from "@/_config/auth";
 import { LoginFormSchema, SignupFormSchema } from "@/_Types/ZodSchema";
 import { withDBConnection } from "@/_utils/controllerWrapper";
-import User from "@/models/userModel";
-import { sendWelcome } from "../emails/emailControllers";
 import { getUser } from "../controllerGlobal";
-import { isDuplicated } from "@/_utils/checkAvailability";
+import User from "@/models/userModel";
 
 
 
 export const credentialsSignup = withDBConnection(async (preState:any, formData:FormData) => {
     // STEP: 1) checking the formData against zod schema:
     const inputs = Object.fromEntries(formData);
-    const validation = SignupFormSchema.safeParse(inputs);
+    const validation = await SignupFormSchema.safeParseAsync(inputs);
 
     if(!validation.success) return {
             success: false,
@@ -21,16 +19,6 @@ export const credentialsSignup = withDBConnection(async (preState:any, formData:
             errors: validation.error.flatten().fieldErrors,
             rawData: inputs
         }
-    console.log("BEFORE HASHING", inputs.password);
-    const result = await isDuplicated("User", "email", (inputs.email) as string);
-    console.log("isDuplicated", result);
-
-    if(result) return {
-        success:false,
-        errors: {email: ["هذا البريد الإلكتروني مسجل بالفعل"]},
-        rawData: inputs
-    }
-
 
     const newUser = await User.create({
         email: formData.get("email"),

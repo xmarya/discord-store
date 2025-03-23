@@ -108,7 +108,7 @@ const userSchema = new Schema<UserDocument>(
       },
     ],
     subscribedPlanDetails: {
-      name: {
+      planName: {
         type: String,
         enum: ["basic", "plus", "unlimited", "none"],
         required: [true, "the registeredPlan field is required"],
@@ -235,7 +235,9 @@ userSchema.methods.comparePasswords = async function(providedPassword:string, us
     actually in this case, since we have set the password to select false, 
     this.password will not be available. So we will pass it from the controllerAuth since we've ot it there.
   */
-  return await bcrypt.compare(providedPassword, userPassword);
+   const result = await bcrypt.compare(providedPassword, userPassword);
+   console.log(result);
+   return result;
 }
 
 // model(Document, Model)

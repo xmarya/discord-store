@@ -10,13 +10,14 @@ export const createStore = withDBConnection(async (prevState:any, formData: Form
   // the newStore probably if got from the formData, the userId from the session
   const session = await auth();
   const userId = session?.user.id;
-  const {storeName, categories} = Object.fromEntries(formData);
+  const {storeName, categories, logo} = Object.fromEntries(formData);
 
   // STEP 1) create the new store:
   const newStore = await Store.create({
     // storeName: formData.get("storeName"),
     storeName,
     owner: userId,
+    logo
     // categories if there, then on post save hook I'll create new Category
   });
 
@@ -28,11 +29,12 @@ export const createStore = withDBConnection(async (prevState:any, formData: Form
 });
 
 export const updateStore = withDBConnection(async (prevState:any, formData: FormData) => {
-  const {storeId, storeName, categories} = Object.fromEntries(formData);
+  const {storeId, storeName, categories, logo} = Object.fromEntries(formData);
 
   // STEP 1) pass in ONLY the editable data:
     await Store.findByIdAndUpdate(storeId, {
-      storeName: formData.get("storeName"),
+      storeName,
+      logo
     });
     // STEP 2) revalidate the path
     revalidatePath("/dashboard/myStore");

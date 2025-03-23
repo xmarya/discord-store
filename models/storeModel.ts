@@ -36,6 +36,7 @@ const storeSchema = new Schema<StoreDocument>({
     ref: "User",
     required: true,
   },
+  logo:String,
   storeAssistants: [
     {
       // relationship (child referencing) because it's 1-few relationship

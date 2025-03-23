@@ -3,7 +3,7 @@ import { Model, Schema, model, models } from "mongoose";
 
 type PlanModel = Model<PlanDocument>;
 const planSchema = new Schema({
-  name: {
+  planName: {
     type: String,
     enum: ["basic", "plus", "unlimited"],
     required: [true, "the name field is required"],
