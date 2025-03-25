@@ -5,7 +5,6 @@ import Input from "./Input";
 const TagInputWrapper = styled.div`
   display: flex;
   gap: 1.2rem;
-  background-color: pink;
 `;
 
 

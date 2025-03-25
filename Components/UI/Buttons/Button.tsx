@@ -4,11 +4,24 @@ import styled from "styled-components";
 export const Button = styled.button`
     /* width: 4rem;
     height: 2rem; */
-    font-size: 1.2rem;
-    background-color: royalblue;
-    color: white;
-    padding-block: 0.8rem;
-    padding-inline: 1.6rem;
+    padding: 0.8rem;
+  background: #9b51e0;
+  color: #fff;
+  font-size: 1.4rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s, transform 0.2s;
+
+  &:hover {
+    background: #7b3bb2;
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+
 `;
 
 /*

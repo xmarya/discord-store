@@ -1,3 +1,4 @@
+import SignOutButton from "@/Components/Blocks/SignOutButton";
 import Link from "next/link";
 
 export default function Dashboard() {
@@ -12,9 +13,7 @@ export default function Dashboard() {
           <Link href="/dashboard/my-store">متجري</Link>
         </li>
         <li>
-          <button>
-            <Link href="/api/auth/signout">تسجيل الخروج</Link>
-          </button>
+          <SignOutButton/>
         </li>
       </ul>
     </div>

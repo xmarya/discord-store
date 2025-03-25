@@ -15,7 +15,7 @@ export default function RootLayout({
     <html lang="ar">
       <StyledComponentsRegistry>
         <body>
-        <Toaster position="top-right" /> {/*NOTE: MUST be placed ABOVE the children directly, not above the body tag*/}
+        <Toaster position="top-center" /> {/*NOTE: MUST be placed ABOVE the children directly, not above the body tag*/}
           {children}
           </body>
       </StyledComponentsRegistry>

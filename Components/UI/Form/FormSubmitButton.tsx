@@ -4,10 +4,7 @@ import styled from "styled-components";
 import { Button } from "../Buttons/Button";
 import { useFormStatus } from "react-dom";
 
-const SubmitButton = styled(Button).attrs({ type: "submit" })`
-  color: white;
-  background-color: green;
-`;
+const SubmitButton = styled(Button).attrs({ type: "submit" })``;
 
 type Props = {
   children: React.ReactNode;
