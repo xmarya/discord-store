@@ -34,6 +34,9 @@ export const withDBConnection = <Args extends any[], T>
       console.log((error as AppError).message);
       throw error;
     }
+    finally {
+      // TODO: try to redirect here by condition
+    }
   };
 };
 
@@ -48,5 +51,5 @@ export const withDBConnection = <Args extends any[], T>
 //    are typed using Parameters<Controller>, ensuring that the arguments passed to Controller : Controller(...args)
 //    match the expected parameter types in this line: type Controller = (...args: any[]) => void;
 
-// 3) reference to my question: How to define the correct return type in Higher-Order Functions:
+// 3) How to define the correct return type in Higher-Order Functions:
 // https://stackoverflow.com/questions/79479201/how-to-define-the-correct-return-type-in-higher-order-functions/79479231#79479231

@@ -2,6 +2,7 @@
 
 import { auth } from "@/_config/auth";
 import { withDBConnection } from "@/_utils/controllerWrapper";
+import { StoreSchema } from "@/_utils/ZodValidations/storeSchema";
 import Store from "@/models/storeModel";
 import User from "@/models/userModel";
 import { revalidatePath } from "next/cache";
@@ -17,7 +18,6 @@ export const createStore = withDBConnection(async (prevState:any, formData: Form
     // storeName: formData.get("storeName"),
     storeName,
     owner: userId,
-    logo
     // categories if there, then on post save hook I'll create new Category
   });
 
@@ -29,12 +29,15 @@ export const createStore = withDBConnection(async (prevState:any, formData: Form
 });
 
 export const updateStore = withDBConnection(async (prevState:any, formData: FormData) => {
-  const {storeId, storeName, categories, logo} = Object.fromEntries(formData);
+  const {storeId, storeName, logo} = Object.fromEntries(formData);
+
+  const body = {
+    /* SOLILOQUY: how to update only the updated field??? */
+  }
 
   // STEP 1) pass in ONLY the editable data:
     await Store.findByIdAndUpdate(storeId, {
       storeName,
-      logo
     });
     // STEP 2) revalidate the path
     revalidatePath("/dashboard/myStore");
