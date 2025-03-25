@@ -1,0 +1,11 @@
+import { Types } from "mongoose";
+
+
+export interface CategoryBasic {
+  name: string;
+  colour: string;
+  store:Types.ObjectId | string, // Types.ObjectId for the back-end operations. string for front-end operations
+  products?:Array<Types.ObjectId>
+};
+
+export type CategoryDocument = CategoryBasic;

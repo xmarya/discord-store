@@ -5,7 +5,10 @@ export default function Home() {
     <main>
       <h1>منصة سهم - الصفحة الرئيسية</h1>
       <Link href="/login">
-        <h4>سجّل في المنصة</h4>
+        <h3>دخول للمنصة</h3>
+      </Link>
+      <Link href="/sign-up">
+          <h3>تسجيل في المنصة</h3>
       </Link>
     </main>
   );

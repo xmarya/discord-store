@@ -1,0 +1,80 @@
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  --colour-grey-0: #fff;
+  --colour-grey-50: #f9fafb;
+  --colour-grey-100: #f3f4f6;
+  --colour-grey-200: #e5e7eb;
+  --colour-grey-300: #d1d5db;
+  --colour-grey-400: #9ca3af;
+  --colour-grey-500: #6b7280;
+  --colour-grey-600: #4b5563;
+  --colour-grey-700: #374151;
+  --colour-grey-800: #1f2937;
+  --colour-grey-900: #111827;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+*:disabled {
+  cursor: not-allowed;
+}
+
+html {
+  font-size: 62.5%;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scroll-snap-type: y mandatory;
+  overflow-x: hidden;
+}
+
+body {
+  max-width: 100svw;
+  color: var(--foreground);
+  background: var(--background);
+  direction: rtl;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+ul {
+  list-style: none;
+  font-size: 1.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-block: 1.6rem;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  font-size: 1.4rem;
+  margin-block: 2rem;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  background-color: var(--colour-grey-200);
+  color: var(--colour-grey-500);
+  border-color: var(--colour-grey-500);
+}
+
+input:disabled,
+select:disabled {
+  background-color: var(--colour-grey-200);
+  color: var(--colour-grey-500);
+  border-color: var(--colour-grey-500);
+}
