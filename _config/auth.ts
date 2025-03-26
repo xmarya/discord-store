@@ -7,7 +7,7 @@ import NextAuth, { CredentialsSignin, type DefaultSession } from "next-auth";
 import Discord from "next-auth/providers/discord";
 import Credentials from "next-auth/providers/credentials";
 import { getOneById, getUserByEmail } from "@/_actions/controllerGlobal";
-import { createDiscordUser } from "@/_actions/mutation/user";
+import { createDiscordUser } from "@/_actions/auth/discord";
 
 // By default, the `id` property does not exist on `session` of async session({ session, user})
 // See the [TypeScript](https://authjs.dev/getting-started/typescript) on how to add it.
