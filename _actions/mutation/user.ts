@@ -1,23 +1,39 @@
+import { auth } from "@/_config/auth";
 import { withDBConnection } from "@/_utils/controllerWrapper";
+import { UpdateUserProfileSchema } from "@/_utils/ZodValidations/userSchema";
 import User from "@/models/userModel";
 
-export const createDiscordUser = withDBConnection(async (newUser) => {
-  console.log("before create");
-  const user = await User.create({
-    email: newUser.email,
-    username: newUser.name,
-    image: newUser.image,
-    signMethod: "discord",
-    discord: {id: newUser.id}
-    //TODO: distinguish between the sigWay methods
+
+export const updateUser = withDBConnection( async (prevData:any, formDate: FormData) => {
+  // NOTE this action is only for credentials user
+  const inputs = Object.fromEntries(formDate);
+  const validation = UpdateUserProfileSchema.safeParse(inputs);
+  if(!validation.success) return {
+    success: false,
+    errors: validation.error.flatten().fieldErrors,
+    rawData: inputs
+  }
+  const session = await auth();
+  const userId = session?.user.id;
+  await User.findByIdAndUpdate(userId, {
+    ...inputs
   });
-  console.log("createNewUser🎭", user);
-  // NOTE: I think there is no need to return the newly created usr because the signIn callback only returns boolean
-  // return user;
 });
 
-export const updateUser = withDBConnection(
-  async (id: string, formDate: FormData) => {
-    // NOTE no need for updateUserAuth since it's related o the discord account, we only have a link with it
+export const changePassword = withDBConnection( async(prevData:any, formData:FormData) => {
+  const inputs = Object.fromEntries(formData);
+
+  const validation = UpdateUserProfileSchema.safeParse(inputs);
+  if(!validation.success) return {
+    success: false,
+    errors: validation.error.flatten().fieldErrors,
+    rawData: inputs
   }
-);
+
+  const session = await auth();
+  const userId = session?.user.id;
+
+  await User.findByIdAndUpdate(userId, {
+    credentials : {password: inputs.password}
+  });
+});

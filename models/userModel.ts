@@ -220,6 +220,15 @@ userSchema.pre("save", async function(next) {
   }
 });
 
+userSchema.pre("save", async function(next) {
+  if(this.isModified("credentials") && this.credentials) {
+    this.credentials.password = await bcrypt.hash(this.credentials.password, 13);
+    this.credentials.passwordChangedAt = new Date();
+  }
+  
+  next();
+});
+
 // this pre hook is to set the passwordChangedAt:
 userSchema.pre("save", async function(next) {
   if(this.credentials && this.isModified(this.credentials.password)) {
