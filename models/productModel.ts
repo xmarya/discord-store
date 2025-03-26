@@ -4,7 +4,7 @@ import Category from "./categoryModel";
 
 type ProductModel = Model<ProductDocument>;
 
-const productSchema = new Schema<ProductDocument>(
+const ProductSchema = new Schema<ProductDocument>(
   {
     name: {
       type: String,
@@ -60,37 +60,35 @@ const productSchema = new Schema<ProductDocument>(
   }
 );
 
-productSchema.virtual("reviews", {
+ProductSchema.virtual("reviews", {
   ref: "Review",
   localField: "_id",
   foreignField: "reviewedModel",
 });
 
-productSchema.pre("save", async function(next) {
-  console.log("productSchema.pre(save)");
-  if(this.isModified("categories")) {
+ProductSchema.pre("save", async function (next) {
+  console.log("ProductSchema.pre(save)");
+  if (this.isModified("categories")) {
     // if a product has been associated with a category, assert its id to the category:
-    await Category.findByIdAndUpdate(this.categories, {$addToSet: {products: this._id}});
+    await Category.findByIdAndUpdate(this.categories, { $addToSet: { products: this._id } });
   }
   next();
 });
 
-productSchema.pre("findOneAndDelete", async function(next) {
-  console.log("productSchema.pre(findOneAndDelete)");
+ProductSchema.pre("findOneAndDelete", async function (next) {
+  console.log("ProductSchema.pre(findOneAndDelete)");
   const doc = await this.model.findOne(this.getQuery()).select("categories");
   const categories = doc.categories;
 
-  if(!doc) return next();
+  if (!doc) return next();
 
-  await Category.updateMany({_id: {$in: categories}}, {$pull: {products: doc._id}});
-  
+  await Category.updateMany({ _id: { $in: categories } }, { $pull: { products: doc._id } });
+
   next();
 });
 
-productSchema.index({ ranking: 1 });
+ProductSchema.index({ ranking: 1 });
 
-const Product =
-  models?.Product ||
-  model<ProductDocument, ProductModel>("Product", productSchema);
+const Product = models?.Product || model<ProductDocument, ProductModel>("Product", ProductSchema);
 
 export default Product;
