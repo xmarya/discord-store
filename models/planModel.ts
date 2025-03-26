@@ -9,30 +9,31 @@ const planSchema = new Schema({
     required: [true, "the name field is required"],
   },
   price: {
-    type: Number,
-    required: [true, "the price field is required"],
+    riyal: {
+      type: Number,
+      required: [true, "the price field is required"],
+    },
+    dollar: {
+      type: Number,
+      required: [true, "the price field is required"],
+    },
   },
-  features: [String] /* SOLILOQUY:  not sure...*/,
+  features: [String],
   quota: {
     ofProducts: {
       type: Number,
-      required: true,
     },
     ofCategories: {
       type: Number,
-      required: true,
     },
     ofStoreAssistants: {
       type: Number,
-      required: true,
     },
     ofColourThemes: {
       type: Number,
-      required: true,
     },
     ofCommission: {
-      type: Number,
-      required: true,
+      type: Number, // in riyals
     },
   },
   discount: {

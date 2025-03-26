@@ -1,5 +1,6 @@
 import { Model, Schema, model, models } from "mongoose";
 import { ProductDocument } from "@/_Types/Product";
+import Category from "./categoryModel";
 
 type ProductModel = Model<ProductDocument>;
 
@@ -63,6 +64,15 @@ productSchema.virtual("reviews", {
   ref: "Review",
   localField: "_id",
   foreignField: "reviewedModel",
+});
+
+productSchema.pre("save", async function(next) {
+  console.log("productSchema.pre(save)");
+  if(this.isModified("category")) {
+    // if a product has been associated with a category, assert its id to the category:
+    await Category.findByIdAndUpdate(this.category, {$addToSet: {products: this._id}});
+  }
+  next();
 });
 
 productSchema.index({ ranking: 1 });

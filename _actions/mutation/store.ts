@@ -11,14 +11,14 @@ export const createStore = withDBConnection(async (prevState:any, formData: Form
   // the newStore probably if got from the formData, the userId from the session
   const session = await auth();
   const userId = session?.user.id;
-  const {storeName, categories, logo} = Object.fromEntries(formData);
+  const {storeName, logo} = Object.fromEntries(formData);
 
   // STEP 1) create the new store:
   const newStore = await Store.create({
     // storeName: formData.get("storeName"),
     storeName,
     owner: userId,
-    // categories if there, then on post save hook I'll create new Category
+    
   });
 
   // STEP 2) link it with the user using userId:
@@ -31,10 +31,6 @@ export const createStore = withDBConnection(async (prevState:any, formData: Form
 export const updateStore = withDBConnection(async (prevState:any, formData: FormData) => {
   const {storeId, storeName, logo} = Object.fromEntries(formData);
 
-  const body = {
-    /* SOLILOQUY: how to update only the updated field??? */
-  }
-
   // STEP 1) pass in ONLY the editable data:
     await Store.findByIdAndUpdate(storeId, {
       storeName,
@@ -43,3 +39,15 @@ export const updateStore = withDBConnection(async (prevState:any, formData: Form
     revalidatePath("/dashboard/myStore");
   }
 );
+
+export const publishStore = withDBConnection(async (storeId) => {
+  await Store.findByIdAndUpdate(storeId, {
+    status:"active"
+  });
+});
+
+export const deleteStore = withDBConnection(async (storeId) => {
+  await Store.findByIdAndDelete(storeId);
+
+  //TODO: delete its products and categories in post hook
+});

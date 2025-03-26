@@ -2,7 +2,10 @@
 export interface Plan {
   _id:string,
   planName: string;
-  price: number;
+  price: {
+    riyal:number,
+    dollar:number
+  };
 }
 
 export interface PlanDetails extends Plan {

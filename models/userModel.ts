@@ -184,7 +184,7 @@ userSchema.virtual("planExpiresInDays").get(function () {
   return Math.floor(ms / (1000 * 60 * 60 * 24));
   /* CHANGE LATER: this must be changed to pre("save") hook since 
     I moved the subscribeEnds from Top-level field to be inside the planDetails object 
-        OR MAYBE NOT??? LET'S TRY IT FIRST THEN DECIDE 👍🏻*/
+    OR MAYBE NOT??? LET'S TRY IT FIRST THEN DECIDE 👍🏻*/
 
   // NOTE: this.subscribeEnds and this.subscribeStarts are Date objects, not numbers.
   // TypeScript does not allow arithmetic (-) directly between Date objects.

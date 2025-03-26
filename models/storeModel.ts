@@ -29,9 +29,6 @@ const storeSchema = new Schema<StoreDocument>({
     
   */
   owner: {
-    /* SOLILOQUY: the best way to relation these two is ...? embeded document , since there will be ONLY one owner, it's 1-1 relationship
-    but wait? the users of course will going to update their data right? then that mean the data here might be stale..?
-    */
     type: Schema.Types.ObjectId,
     ref: "User",
     required: true,
@@ -61,7 +58,7 @@ const storeSchema = new Schema<StoreDocument>({
       of course the plus users can views many theme but eventually they are going to select only one*/
     type: Schema.Types.ObjectId,
     ref: "ColourTheme",
-    // default:"default-theme" //SOLILOQUY:: is this how it should be defined ??
+    // default:"default-theme" //TODO: will be defined later
   },
   status: {
     type: String,
