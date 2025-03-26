@@ -1,12 +1,10 @@
 import { getField } from "@/_actions/controllerGlobal";
 
-export async function isDuplicated(Model: "User" | "Store", field: string, value: string, id?:string) {
+export async function isDuplicated(Model: "User" | "Store" | "Product", field: string, value: string, id?:string) {
 
-  const t1 ="there is an id";
   const valuesList = await getField(Model, field);
   const isTaken = valuesList.some(obj => obj[field] === value && (id && obj._id !== id));
-  // console.log("w/ id", valuesList.some(obj => obj[field] === value && (id && console.log(t1))));
-  // console.log(isTaken);
+
   return isTaken;
 }
 

@@ -4,7 +4,7 @@ import { StoreDocument } from "@/_Types/Store";
 import { Model, Schema, model, models } from "mongoose";
 
 type StoreModel = Model<StoreDocument>;
-const storeSchema = new Schema<StoreDocument>({
+const StoreSchema = new Schema<StoreDocument>({
   storeName: {
     type: String,
     required: true,
@@ -33,7 +33,7 @@ const storeSchema = new Schema<StoreDocument>({
     ref: "User",
     required: true,
   },
-  logo:String,
+  logo: String,
   storeAssistants: [
     {
       // relationship (child referencing) because it's 1-few relationship
@@ -72,26 +72,25 @@ const storeSchema = new Schema<StoreDocument>({
   },
 });
 
-storeSchema.virtual<ProductDocument[]>("products", {
+StoreSchema.virtual<ProductDocument[]>("products", {
   ref: "Product",
   localField: "_id",
   foreignField: "store",
 });
 
-storeSchema.virtual("stats", {
+StoreSchema.virtual("stats", {
   ref: "StoreStat",
   localField: "_id",
   foreignField: "store",
 });
 
-storeSchema.virtual<ReviewDocument[]>("reviews", {
+StoreSchema.virtual<ReviewDocument[]>("reviews", {
   ref: "Review",
   localField: "_id",
   foreignField: "reviewedModel",
 });
 
 //TODO: post save to create categories if there any
-const Store =
-  models?.Store || model<StoreDocument, StoreModel>("Store", storeSchema);
+const Store = models?.Store || model<StoreDocument, StoreModel>("Store", StoreSchema);
 
 export default Store;

@@ -7,7 +7,7 @@ export interface ProductBasic {
   price: number;
   quantity: number;
   image: Array<string>;
-  category: Array<CategoryDocument>;
+  categories: Array<CategoryDocument>;
   description: string;
   status: "inStock" | "outOfStock";
   store: Types.ObjectId;

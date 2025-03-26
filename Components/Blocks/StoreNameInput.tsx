@@ -1,5 +1,5 @@
 "use client";
-import { StoreSchema } from "@/_utils/ZodValidations/storeSchema";
+import { StoreSchema } from "@/_utils/ZodValidations/StoreSchema";
 import { FormBlock } from "../UI/Form/FromBlock";
 import Input from "../UI/Form/Input";
 import { Label } from "../UI/Form/Label";
@@ -23,14 +23,16 @@ export default function StoreNameInput({ storeName, storeId }: Props) {
 
     // Guard clause 3) did the user changed the current name to a new one ?
     // TODO: this should be the 1st condition
-    if (userInput === storeName) return {
+    if (userInput === storeName)
+      return {
         success: true,
-        code: "noChange"
-    };
+        code: "noChange",
+      };
 
-    const validation = await StoreSchema(storeId as string).safeParseAsync({storeName: userInput});
-    
-    if (!validation.success) return {
+    const validation = await StoreSchema(storeId as string).safeParseAsync({ storeName: userInput });
+
+    if (!validation.success)
+      return {
         success: false,
         code: "error",
         experimentalError: validation.error.flatten().fieldErrors,
@@ -53,9 +55,9 @@ export default function StoreNameInput({ storeName, storeId }: Props) {
     // if (isTaken) throw new Error("اسم المتجر مستخدم بالفعل");
 
     return {
-        success: true,
-        code: "valid"
-    };;
+      success: true,
+      code: "valid",
+    };
   }
 
   return (
