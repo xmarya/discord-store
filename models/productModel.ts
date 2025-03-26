@@ -23,7 +23,7 @@ const productSchema = new Schema<ProductDocument>(
       type: [String],
       required: [true, "the image field is required"],
     },
-    category: [Schema.Types.ObjectId],
+    categories: [Schema.Types.ObjectId],
     description: {
       type: String,
       required: [true, "the description field is required"],
@@ -48,7 +48,7 @@ const productSchema = new Schema<ProductDocument>(
       default: 0,
     },
     ranking: {
-      // TODO: this filed will be use to presents the ranking of store's products, it's irrelevant to the storeStats model.
+      // NOTE: this filed will be used to presents the ranking of store's products, it's irrelevant to the storeStats model.
     },
   },
   {
@@ -68,10 +68,22 @@ productSchema.virtual("reviews", {
 
 productSchema.pre("save", async function(next) {
   console.log("productSchema.pre(save)");
-  if(this.isModified("category")) {
+  if(this.isModified("categories")) {
     // if a product has been associated with a category, assert its id to the category:
-    await Category.findByIdAndUpdate(this.category, {$addToSet: {products: this._id}});
+    await Category.findByIdAndUpdate(this.categories, {$addToSet: {products: this._id}});
   }
+  next();
+});
+
+productSchema.pre("findOneAndDelete", async function(next) {
+  console.log("productSchema.pre(findOneAndDelete)");
+  const doc = await this.model.findOne(this.getQuery()).select("categories");
+  const categories = doc.categories;
+
+  if(!doc) return next();
+
+  await Category.updateMany({_id: {$in: categories}}, {$pull: {products: doc._id}});
+  
   next();
 });
 

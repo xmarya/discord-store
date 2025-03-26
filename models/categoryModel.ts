@@ -21,18 +21,16 @@ categorySchema.pre("findOneAndDelete", async function(next) {
   console.log("categorySchema.pre(findOneAndDelete)");
      // STEP 1) execute an explicit query for the document tt get the store nad the products
      // (because this is a QUERY hook, there is no direct access to the schema properties)
-    const doc =  await this.model.findOne(this.getQuery()).select("store products").select("store products");
+    const doc =  await this.model.findOne(this.getQuery()).select("store products");
     const storeId = doc.store;
     const products = doc.products;
 
     if(!doc) return next();
 
-    console.log("is it populated?", products);
-
     //STEP 2) getting the store/products and removing the deleted category form them concurrently:
     Promise.all([
       await Store.findByIdAndUpdate(storeId, {$pull: {categories: doc._id} }),
-      await Product.updateMany({_id: {$in: products} }, { category:[] }),
+      await Product.updateMany({_id: {$in: products} }, {$pull: {categories: doc._id} }),
     ]);
 
 
